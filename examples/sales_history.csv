@@ -1,0 +1,6 @@
+ticket_number,customer_public_id,local_completed_at,sales_rep,location_public_id,tax,item_lookup,original_price,unit_price,qty
+220000000003,0,2015-08-18T20:49:27+00:00,Robert Hirsh,1,0.0,6,,6981.99,1.0
+220000000008,0,2015-09-30T22:58:48+00:00,Robert Hirsh,1,1117.12,6,,6981.99,1.0
+220000000011,0,2015-10-01T20:25:58+00:00,Robert Hirsh,1,255.37,48,,1596.07,1.0
+220000000017,1,2015-10-05T20:17:17+00:00,Robert Hirsh,1,0.0,47,,1596.07,2.0
+220000000018,1,2015-10-05T20:21:41+00:00,Robert Hirsh,1,0.0,46,,1600.0,1.0
