@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+require 'gli'
+require 'hacer'
+require 'logger'
+require './lib/sr_importer'
+
+include GLI::App
+
+LOG = Logger.new(STDOUT)
+
+program_desc 'A Springboard Retail data migration importer tool'
+
+desc 'YAML config file containing credentials for the current migrations.'
+flag [:c,:config], :default_value => './config.yaml'
+
+pre do |global_options,command,options,args|
+  exit_now!("Config file not found #{global_options[:config]}") unless File.exist?(global_options[:config])
+  $importer = SRImporter.new(global_options[:config])
+end
+
+desc 'Import inventory qtys'
+long_desc 'Imports a multi-location inventory qty import file into Springboard Retail.
+
+The file must be prepared following the docs and then passed to this command as the first argumnet.'
+command :inventory_qtys do |c|
+  c.action do |global_options,options,args|
+    $importer.import_inventory_qtys(args.first)
+  end
+end
+
+desc 'Import sales history'
+long_desc 'Imports sales history into Springboard Retail.
+
+The file must be prepared following the docs and then passed to this command as the first argumnet.'
+command :sales_history do |c|
+  c.action do |global_options,options,args|
+    $importer.import_sales_history(args.first)
+  end
+end
+
+desc 'Attach store credit gift cards to customers'
+long_desc 'Matches gift cards in Springboard Retail to customers and adds card # to custom field.
+
+The store credits must have been imported following the recommended configuration in the docs.
+
+It will default to adding the card # in the field "Store Credit #", or you can pass a field as the first argument'
+command :attach_store_credits do |c|
+  c.action do |global_options,options,args|
+    $importer.attach_store_credits(args.first)
+  end
+end
+
+exit run(ARGV)
