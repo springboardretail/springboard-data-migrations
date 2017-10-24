@@ -13,6 +13,7 @@ See sample file [items.csv](../examples/items.csv)
 * `Current Price` (required field, current selling price of item)
 * `Primary Vendor` (optional field, can be Vendor # or Vendor Name)
 * `Active?` (optional field, if present must have a true or false value)
+* any required custom customer fields
 
 
 ## Import Process
