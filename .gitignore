@@ -1,4 +1,6 @@
 /configs
 *.yml
 *.yaml
+
+!/examples/config.yaml
 !.gitignore

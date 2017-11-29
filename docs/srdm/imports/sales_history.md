@@ -11,6 +11,6 @@ This will import sales history as completed POS tickets
 ## Running import
 
 1. Ensure your file is prepared to the exact standards set in [this guide](../../sales_history.md)
-2. Create a config file for the tenant you are importing into using the [instructions](../../README.md)
+2. Create a config file for the tenant you are importing into using the [instructions](../README.md)
 3. From the root directory of the toolset run
 `$ ./srdm -c <config_file> import sales_history -f <import_file> <options>`

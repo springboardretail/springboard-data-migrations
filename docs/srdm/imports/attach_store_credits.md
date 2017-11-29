@@ -7,6 +7,6 @@ This will take store credits already imported as gift cards and match them to cu
 ## Running import
 
 1. Ensure your file is prepared to the exact standards set in [this guide](../../store_credits.md)
-2. Create a config file for the tenant you are importing into using the [instructions](../../README.md)
+2. Create a config file for the tenant you are importing into using the [instructions](../README.md)
 3. From the root directory of the toolset run
 `$ ./srdm -c <config_file> import store_credits <options>`
