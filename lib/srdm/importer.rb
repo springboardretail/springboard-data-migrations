@@ -1,6 +1,6 @@
-Dir["./lib/srdm/importer/inventory_qtys/*.rb"].each {|file| require file }
-Dir["./lib/srdm/importer/sales_history/*.rb"].each {|file| require file }
-Dir["./lib/srdm/importer/store_credits/*.rb"].each {|file| require file }
+require_relative 'importer/sales_history/sales_history_importer'
+require_relative 'importer/inventory_qtys/inventory_qty_importer'
+require_relative 'importer/store_credits/store_credit_attacher'
 
 module SRDM
   module Importer

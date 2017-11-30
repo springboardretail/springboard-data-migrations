@@ -2,7 +2,7 @@ require 'time'
 
 module SRDM
   module Importer
-    class TicketPayment
+    class Payment
       attr_reader :ticket, :lines, :total_payment
 
       def initialize(ticket, lines)

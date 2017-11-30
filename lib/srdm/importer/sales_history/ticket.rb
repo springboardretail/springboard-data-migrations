@@ -1,3 +1,7 @@
+require_relative 'item_line'
+require_relative 'payment'
+require_relative 'shipping_line'
+require_relative 'tax_line'
 require 'time'
 
 module SRDM
@@ -68,10 +72,10 @@ module SRDM
         @customer_public_id = lines.first['customer_public_id']
         @sales_rep = lines.first['sales_rep']
         @location_public_id = lines.first['location_public_id']
-        @completed_at = completed_at(lines.first)
+        @completed_at = parse_completed_at(lines.first)
       end
 
-      def completed_at(line)
+      def parse_completed_at(line)
         begin
           Time.parse(line['local_completed_at']).utc.iso8601
         rescue
@@ -80,7 +84,7 @@ module SRDM
       end
 
       def ticket_payment
-        @ticket_payment ||= TicketPayment.new(self, ticket_lines)
+        @ticket_payment ||= Payment.new(self, ticket_lines)
       end
 
       def process_lines

@@ -2,9 +2,9 @@ require 'bundler/setup'
 require 'springboard-retail'
 require 'logger'
 require 'yaml'
-require './lib/srdm/importer'
-require './lib/srdm/field_manager'
-require './lib/srdm/resource_list'
+require_relative 'srdm/importer'
+require_relative 'srdm/field_manager'
+require_relative 'srdm/resource_list'
 
 module SRDM
   VERSION = '0.1.0'

@@ -1,3 +1,5 @@
+require_relative 'account_prepper'
+require_relative 'ticket'
 require 'csv'
 require 'set'
 require 'progress_bar'
@@ -6,6 +8,11 @@ module SRDM
   module Importer
     class SalesHistoryImporter
       MAX_RETRIES = 3
+      DEFAULT_OPTIONS = {
+        skip_ticket_download: false,
+        refresh_cache: false,
+        use_cache: true
+      }
 
       attr_reader :import_file, :springboard, :ticket_lines, :ticket_count, :success_count
 
@@ -72,9 +79,10 @@ module SRDM
       end
 
       def parse_options(options)
-        @use_cache = options[:use_cache] || true
-        @refresh_cache = options[:refresh_cache] || false
-        @skip_ticket_download = options[:skip_ticket_download] || false
+        options = DEFAULT_OPTIONS.merge(options)
+        @use_cache = options[:use_cache]
+        @refresh_cache = options[:refresh_cache]
+        @skip_ticket_download = options[:skip_ticket_download]
         @import_start_time = options[:import_start_time].to_i if options[:import_start_time]
         @import_end_time = options[:import_end_time].to_i if options[:import_end_time]
       end
@@ -153,7 +161,7 @@ module SRDM
       end
 
       def handle_failed_ticket_request(ticket, err)
-        LOG.error "Failed to import ticket #{ticket.ticket_number} #{err}"
+        LOG.error "Failed to import ticket #{ticket.ticket_number} #{error_message(err)}"
         ticket_failure_output << [
           ticket.ticket_number,
           err,
@@ -162,6 +170,13 @@ module SRDM
           err.response.raw_body,
           err.response.headers
         ]
+      end
+
+      def error_message(err)
+        if err.respond_to?(:response) && err.response.respond_to?(:body)
+          return "#{err.response.body.message} #{err.response.body.details.to_json}"
+        end
+        err
       end
 
       def ticket_failure_output
@@ -185,7 +200,12 @@ module SRDM
       end
 
       def ticket_key(line)
-        "#{line['ticket_number']}-#{line['location_public_id']}-#{line['local_completed_at']}-#{line['customer_public_id']}"
+        [
+          line['ticket_number'],
+          line['location_public_id'],
+          line['local_completed_at'],
+          line['customer_public_id']
+        ].join('-')
       end
     end
   end
