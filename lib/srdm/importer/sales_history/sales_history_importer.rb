@@ -7,6 +7,8 @@ require 'progress_bar'
 module SRDM
   module Importer
     class SalesHistoryImporter
+      include ErrorHelpers
+
       MAX_RETRIES = 3
       DEFAULT_OPTIONS = {
         skip_ticket_download: false,
@@ -139,9 +141,9 @@ module SRDM
           @springboard[:sales][:tickets].post!(ticket.to_h)
           @success_count += 1
         rescue Springboard::Client::RequestFailed => err
-          if err.response.body.details['qty'] && (retry_count += 1) <= MAX_RETRIES
-            ticket.flatten_line_qtys
-            retry
+          if (retry_count += 1) <= MAX_RETRIES
+            ticket.flatten_line_qtys if ticket_qty_error?(err)
+            retry unless unfixable_request_error?(err)
           end
           handle_failed_ticket_request(ticket, err)
         rescue => err
@@ -170,13 +172,6 @@ module SRDM
           err.response.raw_body,
           err.response.headers
         ]
-      end
-
-      def error_message(err)
-        if err.respond_to?(:response) && err.response.respond_to?(:body)
-          return "#{err.response.body.message} #{err.response.body.details.to_json}"
-        end
-        err
       end
 
       def ticket_failure_output

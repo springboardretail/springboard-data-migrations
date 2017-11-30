@@ -1,4 +1,4 @@
-# require '../lib/physical_count'
+require_relative 'physical_count'
 require 'csv'
 require 'progress_bar'
 
