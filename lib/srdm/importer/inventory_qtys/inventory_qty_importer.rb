@@ -51,7 +51,8 @@ module SRDM
         import_file.each do |line|
           location = line['Location'] || line['Location #']
           item = line['Item #'] || line['Item']
-          inventory_counts[location][item] += line['Qty'].to_f
+          qty = line['Qty'] || line['Quantity']
+          inventory_counts[location][item] += qty.to_i
         end
       end
 
