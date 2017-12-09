@@ -83,16 +83,14 @@ module SRDM
           item = @springboard[:items].filter(public_id: 'MISC').first
           return item if item
           LOG.info 'Creating default "MISC" item'
-          $custom_fields.while_deactivated do
+          custom_fields = FieldManager.new(@springboard, 'item', include_settings: false)
+          custom_fields.while_deactivated do
             response = @springboard[:items].post(DEFAULT_ITEM_REQUEST_BODY)
             raise unless response.success?
             return response.resource.get.body
           end
         rescue
-          LOG.error 'Failed to create default "MISC" item'
-          LOG.error response.body
-          LOG.info 'Import canceled'
-          exit
+          abort('Failed to create default "MISC" item. Cancelling import!')
         end
       end
 
@@ -101,16 +99,14 @@ module SRDM
           customer = @springboard[:customers].filter(public_id: 'CASH').first
           return customer if customer
           LOG.info 'Creating default "CASH" customer'
-          $custom_fields.while_deactivated do
+          custom_fields = FieldManager.new(@springboard, 'customer', include_settings: false)
+          custom_fields.while_deactivated do
             response = @springboard[:customers].post(DEFAULT_CUSTOMER_REQUEST_BODY)
             raise unless response.success?
             return response.resource.get.body
           end
         rescue
-          LOG.error 'Failed to create default "CASH" customer'
-          LOG.error response.body
-          LOG.info 'Import canceled'
-          exit
+          abort('Failed to create default "CASH" customer. Cancelling import!')
         end
       end
 
