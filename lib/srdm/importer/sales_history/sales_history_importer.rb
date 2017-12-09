@@ -39,6 +39,7 @@ module SRDM
         process_import_file
         build_tickets
         check_for_duplicate_tickets
+        check_for_stations
         wait_until_import_is_ready_to_start
         begin
           import_tickets
@@ -51,8 +52,8 @@ module SRDM
 
       def import_tickets
         bar = ProgressBar.new tickets.count
-        tickets.each do |ticket|
-          when_ready_to_import do
+        when_ready_to_import do
+          tickets.each do |ticket|
             @ticket_count += 1
             import_ticket(ticket)
             bar.increment!
@@ -62,7 +63,7 @@ module SRDM
 
       def wrap_up_import
         $custom_fields.reactivate
-        LOG.info "Done! Successfully imported #{success_count} / #{ticket_count} tickets"
+        LOG.info "Successfully imported #{success_count} out of #{tickets.count} tickets"
         LOG.info "Failed tickets exported to #{ticket_failure_output.path}" if @ticket_failure_output
       end
 
@@ -113,7 +114,17 @@ module SRDM
           used_ticket_nums << ticket.ticket_number
         end
         if conflict_count > 0
-          raise "Found #{conflict_count} duplicate ticket numbers. Please resolve the issues on your file."
+          abort("Found #{conflict_count} duplicate ticket numbers. Please resolve the issues on your file.")
+        end
+      end
+
+      def check_for_stations
+        locations_missing_stations = Set.new
+        tickets.each do |ticket|
+          locations_missing_stations << ticket.location_public_id if ticket.station_id.nil?
+        end
+        if locations_missing_stations.count > 0
+          abort("Missing stations in the following locations #{locations_missing_stations}")
         end
       end
 
