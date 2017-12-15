@@ -37,10 +37,12 @@ module SRDM
     end
 
     def log_required_fields
-      if @include_settings
+      if @include_settings && @required_settings.count > 0
         @required_settings.each { |setting| LOG.info "Account has #{setting.split('.').last.gsub('_', ' ')} for POS" }
       end
-      LOG.info "Account has #{@required_custom_fields.count} required custom #{@groups} fields"
+      if @required_custom_fields.count > 0
+        LOG.info "Account has #{@required_custom_fields.count} required custom #{@groups} fields"
+      end
     end
 
     def while_deactivated(&blk)

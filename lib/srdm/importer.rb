@@ -1,3 +1,4 @@
+require_relative 'importer/csv_parser'
 require_relative 'importer/error_helpers'
 require_relative 'importer/sales_history/sales_history_importer'
 require_relative 'importer/inventory_qtys/inventory_qty_importer'

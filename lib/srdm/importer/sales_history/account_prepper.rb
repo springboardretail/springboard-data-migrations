@@ -54,8 +54,13 @@ module SRDM
         @payment_type_id ||= find_or_create_payment_type
       end
 
-      def locations_with_stations
-        @locations_with_stations ||= find_locations_with_stations
+      def locations_and_stations
+        @locations_and_stations ||= find_locations_and_stations
+      end
+
+      def create_defaults
+        default_customer
+        default_item
       end
 
       def default_customer
@@ -110,7 +115,7 @@ module SRDM
         end
       end
 
-      def find_locations_with_stations
+      def find_locations_and_stations
         @springboard[:locations].embed(:stations).each_with_object({}) do |location, hash|
           hash[location['public_id']] = location
           hash[location['name']] = location

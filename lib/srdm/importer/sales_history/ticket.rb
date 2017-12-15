@@ -36,7 +36,7 @@ module SRDM
       end
 
       def location
-        @location ||= $account.locations_with_stations[lines.first['location_public_id']]
+        @location ||= $account.locations_and_stations[lines.first['location_public_id']]
       end
 
       def station_id

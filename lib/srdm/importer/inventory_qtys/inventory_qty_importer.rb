@@ -8,7 +8,7 @@ module SRDM
       attr_reader :import_file, :springboard, :reason_name, :inventory_counts
 
       def initialize(inventory_qty_file, client, reason_name: 'Initial Import')
-        @import_file = CSV.read(inventory_qty_file, headers: true)
+        @import_file = CSVParser.new(inventory_qty_file)
         @springboard = client
         @reason_name = reason_name
         @inventory_counts = Hash.new { |hash, key| hash[key] = Hash.new(0) }
@@ -42,7 +42,7 @@ module SRDM
           location_id = @springboard[:locations].filter(location_filter).first.id
           count = PhysicalCount.new(springboard, location_id, reason_code)
         rescue
-          LOG.error "Failed to create physical count for location #{location}, skipping this location"
+          LOG.error "Failed to create physical count for location \"#{location}\", skipping this location"
           return nil
         end
       end

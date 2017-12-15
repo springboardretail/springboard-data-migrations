@@ -19,7 +19,7 @@ module SRDM
       attr_reader :import_file, :springboard, :ticket_lines, :ticket_count, :success_count
 
       def initialize(sales_history_file, client, options = {})
-        @import_file = CSV.read(sales_history_file, headers: true)
+        @import_file = CSVParser.new(sales_history_file)
         @springboard = client
         parse_options(options)
         parse_valid_import_times
@@ -40,6 +40,7 @@ module SRDM
         build_tickets
         check_for_duplicate_tickets
         check_for_stations
+        $account.create_defaults
         wait_until_import_is_ready_to_start
         begin
           import_tickets
@@ -121,10 +122,11 @@ module SRDM
       def check_for_stations
         locations_missing_stations = Set.new
         tickets.each do |ticket|
-          locations_missing_stations << ticket.location_public_id if ticket.station_id.nil?
+          location = $account.locations_and_stations[ticket.location_public_id]
+          locations_missing_stations << ticket.location_public_id unless location && location['stations'].count > 0
         end
         if locations_missing_stations.count > 0
-          abort("Missing stations in the following locations #{locations_missing_stations}")
+          abort("Missing stations in the following locations #{locations_missing_stations.to_a}")
         end
       end
 
