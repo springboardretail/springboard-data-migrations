@@ -7,7 +7,7 @@ require 'time'
 module SRDM
   module Importer
     class Ticket
-      attr_reader :lines, :station, :customer_public_id, :completed_at, :sales_rep,
+      attr_reader :lines, :station, :customer_number, :completed_at, :sales_rep,
                   :location_public_id, :tax, :item_lines, :tax_lines, :shipping_lines
 
       attr_accessor :ticket_number
@@ -25,6 +25,7 @@ module SRDM
           customer_public_id: customer_public_id,
           created_at: completed_at,
           completed_at: completed_at,
+          sales_rep: sales_rep,
           item_lines: Array(item_lines).map(&:to_h),
           tax_lines: Array(tax_lines).map(&:to_h),
           payments: [ticket_payment.to_h],
@@ -48,7 +49,7 @@ module SRDM
       end
 
       def customer_public_id
-        return @customer_public_id if $account.customers.include? @customer_public_id
+        return @customer_number if $account.customers.include? @customer_number
         $account.default_customer.public_id
       end
 
@@ -69,7 +70,7 @@ module SRDM
 
       def process_ticket_details
         @ticket_number = lines.first['ticket_number']
-        @customer_public_id = lines.first['customer_public_id']
+        @customer_number = lines.first['customer_public_id']
         @sales_rep = lines.first['sales_rep']
         @location_public_id = lines.first['location_public_id']
         @completed_at = parse_completed_at(lines.first)

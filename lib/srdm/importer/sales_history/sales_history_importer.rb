@@ -1,7 +1,7 @@
 require_relative 'account_prepper'
+require_relative 'duplicate_ticket_checker'
 require_relative 'ticket'
 require 'csv'
-require 'set'
 require 'progress_bar'
 
 module SRDM
@@ -40,6 +40,7 @@ module SRDM
         build_tickets
         check_for_duplicate_tickets
         check_for_stations
+        check_for_v2_sales_rep_feature ## Temp needed until API bug for v2 sales rep is fixed
         $account.create_defaults
         wait_until_import_is_ready_to_start
         begin
@@ -64,15 +65,15 @@ module SRDM
 
       def wrap_up_import
         $custom_fields.reactivate
-        LOG.info "Successfully imported #{success_count} out of #{tickets.count} tickets"
-        LOG.info "Failed tickets exported to #{ticket_failure_output.path}" if @ticket_failure_output
+        SRDM::LOG.info "Successfully imported #{success_count} out of #{tickets.count} tickets"
+        SRDM::LOG.info "Failed tickets exported to #{ticket_failure_output.path}" if @ticket_failure_output
       end
 
       def wait_until_import_is_ready_to_start
         if @import_start_time && !@valid_import_hours.include?(Time.now.hour)
-          LOG.warn "Waiting until #{@import_start_time}:00 to begin the import"
+          SRDM::LOG.warn "Waiting until #{@import_start_time}:00 to begin the import"
         end
-        when_ready_to_import { LOG.info 'Beginning ticket import' }
+        when_ready_to_import { SRDM::LOG.info 'Beginning ticket import' }
       end
 
       def when_ready_to_import(&blk)
@@ -108,15 +109,7 @@ module SRDM
       end
 
       def check_for_duplicate_tickets
-        used_ticket_nums = Set.new
-        conflict_count = 0
-        tickets.each do |ticket|
-          conflict_count += 1 if used_ticket_nums.include?(ticket.ticket_number)
-          used_ticket_nums << ticket.ticket_number
-        end
-        if conflict_count > 0
-          abort("Found #{conflict_count} duplicate ticket numbers. Please resolve the issues on your file.")
-        end
+        DuplicateTicketChecker.new(tickets).check!
       end
 
       def check_for_stations
@@ -126,12 +119,27 @@ module SRDM
           locations_missing_stations << ticket.location_public_id unless location && location['stations'].count > 0
         end
         if locations_missing_stations.count > 0
-          abort("Missing stations in the following locations #{locations_missing_stations.to_a}")
+          SRDM::LOG.warn "Missing stations in the following locations #{locations_missing_stations.to_a}"
+          puts 'Would you like me to create the stations? (y/n)'
+          if STDIN.gets.chomp.to_s.strip.downcase == 'y'
+            create_stations(locations_missing_stations)
+            $account.refresh_locations_and_stations
+          else
+            abort('Aborted by the user')
+          end
         end
       end
 
+      def create_stations(locations_missing_stations)
+        locations_missing_stations.each do |location_number|
+          location = springboard[:locations].filter(public_id: location_number).first
+          springboard[:stations].post!(location_id: location.id, active: true, name: 'Station 1')
+        end
+        SRDM::LOG.info "Successfully created #{locations_missing_stations.count} stations"
+      end
+
       def build_tickets
-        LOG.info 'Building ticket requests'
+        SRDM::LOG.info 'Building ticket requests'
         bar = ProgressBar.new ticket_lines.count
         @tickets = sorted_ticket_lines.each_with_object([]) do |(_key, lines), array|
           ticket = Ticket.new(lines)
@@ -166,7 +174,7 @@ module SRDM
       end
 
       def handle_unknown_ticket_failure(ticket, err)
-        LOG.error "Failed to import ticket #{ticket.ticket_number} #{err}"
+        SRDM::LOG.error "Failed to import ticket #{ticket.ticket_number} #{err}"
         begin
           ticket_details = ticket.to_h
         rescue => err
@@ -176,7 +184,7 @@ module SRDM
       end
 
       def handle_failed_ticket_request(ticket, err)
-        LOG.error "Failed to import ticket #{ticket.ticket_number} #{error_message(err)}"
+        SRDM::LOG.error "Failed to import ticket #{ticket.ticket_number} #{error_message(err)}"
         ticket_failure_output << [
           ticket.ticket_number,
           err,
@@ -192,14 +200,13 @@ module SRDM
       end
 
       def create_ticket_failure_output
-        subdomain = springboard.base_uri.hostname.split('.').first
-        csv = CSV.open("./tmp/#{subdomain}_failed_tickets_#{Date.today}.csv", 'w')
+        csv = CSV.open("./tmp/#{SRDM.subdomain}_failed_tickets_#{Date.today}.csv", 'w')
         csv << ['Ticket #', 'Error', 'Request Body', 'Response Code', 'Response Body', 'Response Headers']
         csv
       end
 
       def process_import_file
-        LOG.info 'Processing sales history import file'
+        SRDM::LOG.info 'Processing sales history import file'
         bar = ProgressBar.new @import_file.count
         import_file.each do |line|
           ticket_lines[ticket_key(line)] << line
@@ -214,6 +221,19 @@ module SRDM
           line['local_completed_at'],
           line['customer_public_id']
         ].join('-')
+      end
+
+      ## Temp needed until API bug for v2 sales rep is fixed
+      def check_for_v2_sales_rep_feature
+        feature_flags = springboard[:settings]['springboard.feature_flags'].get.body
+        if feature_flags['value']['sales_reps'] == true
+          warning_text = "#{SRDM.subdomain} has Sales Rep V2 featuer flag enabled. This will cause all sales reps" \
+                         'to be ignored during the import. Contact Springboard Retail support rep to temporarily' \
+                         'disable featuer flag for import'
+          SRDM::LOG.warn warning_text
+          puts 'Would you like to continue importing without sales reps? (y/n)'
+          abort('Aborted by user') unless STDIN.gets.chomp.to_s.downcase.strip == 'y'
+        end
       end
     end
   end

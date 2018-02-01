@@ -17,6 +17,10 @@ module SRDM
     @config_file = YAML.load_file(config_file)
   end
 
+  def SRDM.subdomain
+    @subdomain ||= SRDM.config.sr_subdomain
+  end
+
   def SRDM.client
     @client ||= create_client
   end

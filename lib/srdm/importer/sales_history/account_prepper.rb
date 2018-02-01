@@ -1,3 +1,5 @@
+require 'set'
+
 module SRDM
   module Importer
     class AccountPrepper
@@ -58,6 +60,10 @@ module SRDM
         @locations_and_stations ||= find_locations_and_stations
       end
 
+      def refresh_locations_and_stations
+        @locations_and_stations = nil
+      end
+
       def create_defaults
         default_customer
         default_item
@@ -87,7 +93,7 @@ module SRDM
         begin
           item = @springboard[:items].filter(public_id: 'MISC').first
           return item if item
-          LOG.info 'Creating default "MISC" item'
+          SRDM::LOG.info 'Creating default "MISC" item'
           custom_fields = FieldManager.new(@springboard, 'item', include_settings: false)
           custom_fields.while_deactivated do
             response = @springboard[:items].post(DEFAULT_ITEM_REQUEST_BODY)
@@ -103,7 +109,7 @@ module SRDM
         begin
           customer = @springboard[:customers].filter(public_id: 'CASH').first
           return customer if customer
-          LOG.info 'Creating default "CASH" customer'
+          SRDM::LOG.info 'Creating default "CASH" customer'
           custom_fields = FieldManager.new(@springboard, 'customer', include_settings: false)
           custom_fields.while_deactivated do
             response = @springboard[:customers].post(DEFAULT_CUSTOMER_REQUEST_BODY)
@@ -125,11 +131,11 @@ module SRDM
       def find_or_create_payment_type
         existing_payment_type = @springboard[:payment_types].filter(name: 'External').first
         return existing_payment_type.id if existing_payment_type
-        LOG.info "Creating custom payment type for imported tickets"
+        SRDM::LOG.info "Creating custom payment type for imported tickets"
         begin
           @springboard[:payment_types].post!(name: 'External').resource.get.body.id
         rescue
-          LOG.error 'Failed to create custom payment type'
+          SRDM::LOG.error 'Failed to create custom payment type'
         end
       end
     end

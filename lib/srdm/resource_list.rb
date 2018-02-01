@@ -71,8 +71,7 @@ module SRDM
     end
 
     def cache_filepath
-      subdomain = @springboard.base_uri.host.split('.').first
-      "./tmp/#{subdomain}_#{resource_name}#{'_with_alts' if alt_lookups}_cache"
+      "./tmp/#{SRDM.subdomain}_#{resource_name}#{'_with_alts' if alt_lookups}_cache"
     end
 
     def save_cache(downloaded_resource)
