@@ -8,7 +8,8 @@ module SRDM
   module Importer
     class Ticket
       attr_reader :lines, :station, :customer_number, :completed_at, :sales_rep,
-                  :location_public_id, :tax, :item_lines, :tax_lines, :shipping_lines
+                  :location_public_id, :tax, :item_lines, :tax_lines, :shipping_lines,
+                  :local_completed_at
 
       attr_accessor :ticket_number
 
@@ -24,7 +25,9 @@ module SRDM
           station_id: station_id,
           customer_public_id: customer_public_id,
           created_at: completed_at,
+          local_created_at: local_completed_at,
           completed_at: completed_at,
+          local_completed_at: local_completed_at,
           sales_rep: sales_rep,
           item_lines: Array(item_lines).map(&:to_h),
           tax_lines: Array(tax_lines).map(&:to_h),
@@ -73,6 +76,7 @@ module SRDM
         @customer_number = lines.first['customer_public_id']
         @sales_rep = lines.first['sales_rep']
         @location_public_id = lines.first['location_public_id']
+        @local_completed_at = lines.first['local_completed_at']
         @completed_at = parse_completed_at(lines.first)
       end
 
