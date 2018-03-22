@@ -19,10 +19,11 @@ desc 'Import'
 long_desc 'Imports various resources into Springboard Retail account'
 command [:import, :importer] do |c|
   c.desc 'Import inventory qtys'
-  c.long_desc 'Imports a multi-location inventory qty import file into Springboard Retail.
-
-  The file must be prepared following the docs and then passed to this command.'
+  c.long_desc "Imports a multi-location inventory qty import file into Springboard Retail.\n\n" \
+              'The file must be prepared following the docs and then passed to this command.'
   c.command [:inventory_qtys, :inventory_qty, :counts, :inventory, :qtys] do |sc|
+    sc.switch [:p, :resume_physical_counts], desc: 'Adds qtys to existing physical count in progress if available'
+    sc.flag [:r, :reason_code], desc: 'Set the reason code to use on the import', default_value: 'Initial Import'
     sc.flag [:f, :file], desc: 'Set the import file', required: true
     sc.action do |global_options,options,args|
       SRDM::Importer.inventory_qtys(options)
@@ -30,9 +31,8 @@ command [:import, :importer] do |c|
   end
 
   c.desc 'Import sales history'
-  c.long_desc 'Imports sales history into Springboard Retail.
-
-  The file must be prepared following the docs and then passed to this command.'
+  c.long_desc "Imports sales history into Springboard Retail.\n\n" \
+              'The file must be prepared following the docs and then passed to this command.'
   c.command [:sales_history, :sales, :tickets] do |sc|
     sc.switch [:t, :skip_ticket_download], desc: 'Skips downloading tickets assuming all tickets on import file are new'
     sc.switch [:r, :refresh_cache], desc: 'Forces a re-download of cached resources'
@@ -57,11 +57,9 @@ command [:import, :importer] do |c|
   end
 
   c.desc 'Attach store credit gift cards to customers'
-  c.long_desc 'Matches gift cards in Springboard Retail to customers and adds card # to custom field.
-
-  The store credits must have been imported following the recommended configuration in the docs.
-
-  It will default to adding the card # in the field "Store Credit #", or you can pass a field.'
+  c.long_desc "Matches gift cards in Springboard Retail to customers and adds card # to custom field.\n\n" \
+              "The store credits must have been imported following the recommended configuration in the docs.\n\n" \
+              'It will default to adding the card # in the field "Store Credit #", or you can pass a field.'
   c.command [:attach_store_credits, :credits, :store_credits] do |sc|
     sc.flag [:f, :field_name], desc: 'Set the store credit field name', default_value: 'Store Credit #'
     sc.flag [:s, :system], desc: 'Specify source system for special consideration (ex: Lightspeed)'

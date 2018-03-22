@@ -11,7 +11,7 @@ module SRDM
     end
 
     def Importer.inventory_qtys(options)
-      InventoryQtyImporter.new(options[:file], SRDM.client).import
+      InventoryQtyImporter.new(options[:file], SRDM.client, options).import
     end
 
     def Importer.attach_store_credits(options)

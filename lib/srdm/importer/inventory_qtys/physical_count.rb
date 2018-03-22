@@ -3,10 +3,11 @@ module SRDM
     class PhysicalCount
       attr_reader :springboard, :location_id, :reason_code, :status, :failed_lines
 
-      def initialize(springboard, location_id, reason_code)
+      def initialize(springboard, location_id, reason_code, resume_existing_count: false)
         @springboard = springboard
         @location_id = location_id
         @reason_code = reason_code
+        @resume_existing_count = resume_existing_count
         @status = 'pending'
         @failed_lines = []
       end
@@ -52,7 +53,20 @@ module SRDM
       end
 
       def count
-        @count ||= create_count
+        @count ||= find_or_create_count
+      end
+
+      def find_or_create_count
+        begin
+          if @resume_existing_count
+            existing_count_filter = {'$and' => [{status: 'counting'}, {location_id: location_id}]}
+            existing_count = springboard[:inventory][:physical_counts].filter(existing_count_filter).first
+            return springboard[:inventory][:physical_counts][existing_count.id] if existing_count
+          end
+          create_count
+        rescue
+          LOG.error "Failed to find or create count for location ID #{location_id}"
+        end
       end
 
       def create_count

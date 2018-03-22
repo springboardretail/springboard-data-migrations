@@ -5,19 +5,20 @@ require 'progress_bar'
 module SRDM
   module Importer
     class InventoryQtyImporter
-      attr_reader :import_file, :springboard, :reason_name, :inventory_counts
+      attr_reader :import_file, :springboard, :options, :reason_name, :inventory_counts
 
-      def initialize(inventory_qty_file, client, reason_name: 'Initial Import')
+      def initialize(inventory_qty_file, client, options)
         @import_file = CSVParser.new(inventory_qty_file)
         @springboard = client
-        @reason_name = reason_name
+        @options = options
+        @reason_name = options[:reason_code] || 'Initial Import'
         @inventory_counts = Hash.new { |hash, key| hash[key] = Hash.new(0) }
       end
 
       def import
         process_import_file
         inventory_counts.each do |location, items|
-          count = create_physical_count(location)
+          count = physical_count(location)
           if count
             LOG.info "Adding items to physical count for location #{location}"
             add_items_to_count(count, items)
@@ -36,11 +37,16 @@ module SRDM
         end
       end
 
-      def create_physical_count(location)
+      def physical_count(location)
         begin
           location_filter = {'$or' => [{name: location}, {public_id: location}]}
           location_id = @springboard[:locations].filter(location_filter).first.id
-          count = PhysicalCount.new(springboard, location_id, reason_code)
+          PhysicalCount.new(
+            springboard,
+            location_id,
+            reason_code,
+            resume_existing_count: @options[:resume_physical_counts]
+          )
         rescue
           LOG.error "Failed to create physical count for location \"#{location}\", skipping this location"
           return nil
