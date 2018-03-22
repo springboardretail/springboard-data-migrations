@@ -25,9 +25,7 @@ module SRDM
           station_id: station_id,
           customer_public_id: customer_public_id,
           created_at: completed_at,
-          local_created_at: local_completed_at,
           completed_at: completed_at,
-          local_completed_at: local_completed_at,
           sales_rep: sales_rep,
           item_lines: Array(item_lines).map(&:to_h),
           tax_lines: Array(tax_lines).map(&:to_h),
@@ -94,8 +92,8 @@ module SRDM
 
       def process_lines
         @item_lines = lines.map { |line| ItemLine.new(line) }
-        @tax_lines = [TaxLine.new(lines.first)] if lines.first['tax'].to_f > 0
-        @shipping_lines = [ShippingLine.new(lines.first)] if lines.first['shipping'].to_f > 0    
+        @tax_lines = [TaxLine.new(lines.first)] if lines.first['tax'].to_f != 0
+        @shipping_lines = [ShippingLine.new(lines.first)] if lines.first['shipping'].to_f != 0    
       end
     end
   end
