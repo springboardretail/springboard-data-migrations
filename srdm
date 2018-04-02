@@ -23,6 +23,7 @@ command [:import, :importer] do |c|
               'The file must be prepared following the docs and then passed to this command.'
   c.command [:inventory_qtys, :inventory_qty, :counts, :inventory, :qtys] do |sc|
     sc.switch [:p, :resume_physical_counts], desc: 'Adds qtys to existing physical count in progress if available'
+    sc.switch [:o, :leave_count_open], desc: 'Leaves physical count open for additional modifications'
     sc.flag [:r, :reason_code], desc: 'Set the reason code to use on the import', default_value: 'Initial Import'
     sc.flag [:f, :file], desc: 'Set the import file', required: true
     sc.action do |global_options,options,args|

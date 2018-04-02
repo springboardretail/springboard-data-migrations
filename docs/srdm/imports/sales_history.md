@@ -2,7 +2,7 @@
 This will import sales history as completed POS tickets
 
 ## Options
-* `-f` Set the import file to be used `required`
+* `-f <filepath>` Set the import file to be used `required`
 * `-t` Skip downloading existing tickets. Use only if there is existing tickets in Springboard and no conflicts on the spreadsheet
 * `-r` Refresh downloaded cache for customers and items. Use if data has been updated in the account since last run
 * `-s` Start time for scheduled imports. Only use if customer is live and has required POS fields

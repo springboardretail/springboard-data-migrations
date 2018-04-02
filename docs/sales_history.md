@@ -18,7 +18,7 @@ See sample file [sales_history.csv](../examples/sales_history.csv)
 
 
 ## Import Process
-Coming soon...
+Import completed using the SRDM import tool. Sales history import tool options can be found [here](../docs/srdm/imports/sales_history.md)
 
 
 ## Tips

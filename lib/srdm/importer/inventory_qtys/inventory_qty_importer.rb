@@ -22,7 +22,7 @@ module SRDM
           if count
             LOG.info "Adding items to physical count for location #{location}"
             add_items_to_count(count, items)
-            count.complete
+            count.complete unless @options[:leave_count_open]
           end
         end
       end

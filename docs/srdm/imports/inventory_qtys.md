@@ -2,7 +2,10 @@
 This will import inventory quantities as physical counts. One count per location.
 
 ## Options
-* `-f` Set the import file to be used `required`
+* `-f <filepath>` Set the import file to be used `required`
+* `-r <reason>` Allows specifying a custom existing inventory adjustment reason code. Defaults to "Initial Import"
+* `-p` Resumes existing physical count for location that is already in progress
+* `-o` Leaves physical count open for edits after import
 
 ## Running import
 

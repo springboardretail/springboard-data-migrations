@@ -21,6 +21,7 @@ See sample file [store_credits.csv](../examples/store_credits.csv)
 6. Click `Upload` button to upload file to Springboard Retail
 7. On the mapping screen we will map fields to their exact column name matches so all of the required fields listed above should have auto mapped
 8. Click the `Complete Import` button to begin the gift card import
+9. After the import is complete, you can use the SRDM import tool to attach the gift card number to the corresponding customer records. Store Credit attachment tool options can be found [here](../docs/srdm/imports/attach_store_credits.md)
 
 
 ## Tips

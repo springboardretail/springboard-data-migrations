@@ -2,6 +2,7 @@
 This will take store credits already imported as gift cards and match them to customers with the same number
 
 ## Options
+* `-f <custom_field_name>` Set the custom field name that should store the gift card number. Default value is "Store Credit #"
 * `-s` Set the system that the store credits were generated in. Useful if the system has special rules such as Lightspeed where the customer numbers have a special character that the store credits(gift cards) do not have
 
 ## Running import

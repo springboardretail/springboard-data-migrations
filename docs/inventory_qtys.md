@@ -35,7 +35,7 @@ See sample file [inventory_qtys.csv](../examples/inventory_qtys.csv) and [invent
 19. Click the `Accept Count` button to finalize the count and begin making adjustments. The adjustments can take up to an hour to complete depending on the number of items.
 
 ### Multiple Location Import Tool
-Coming soon...
+Import completed using the SRDM import tool. Inventory qty import tool options can be found [here](../docs/srdm/imports/inventory_qtys.md)
 
 
 ## Tips
