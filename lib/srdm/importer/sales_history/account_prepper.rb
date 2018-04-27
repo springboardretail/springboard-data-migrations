@@ -97,11 +97,11 @@ module SRDM
           custom_fields = FieldManager.new(@springboard, 'item', include_settings: false)
           custom_fields.while_deactivated do
             response = @springboard[:items].post(DEFAULT_ITEM_REQUEST_BODY)
-            raise unless response.success?
+            raise response.body.to_s unless response.success?
             return response.resource.get.body
           end
-        rescue
-          abort('Failed to create default "MISC" item. Cancelling import!')
+        rescue => err
+          abort("Failed to create default \"MISC\" item. Err: #{err} \nCancelling import!")
         end
       end
 
@@ -113,11 +113,11 @@ module SRDM
           custom_fields = FieldManager.new(@springboard, 'customer', include_settings: false)
           custom_fields.while_deactivated do
             response = @springboard[:customers].post(DEFAULT_CUSTOMER_REQUEST_BODY)
-            raise unless response.success?
+            raise response.body.to_s unless response.success?
             return response.resource.get.body
           end
         rescue
-          abort('Failed to create default "CASH" customer. Cancelling import!')
+          abort("Failed to create default \"CASH\" customer. Err: #{err} \nCancelling import!")
         end
       end
 

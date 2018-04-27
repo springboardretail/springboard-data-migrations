@@ -131,9 +131,9 @@ module SRDM
       end
 
       def create_stations(locations_missing_stations)
-        locations_missing_stations.each do |location_number|
-          location = springboard[:locations].filter(public_id: location_number).first
-          springboard[:stations].post!(location_id: location.id, active: true, name: 'Station 1')
+        locations_missing_stations.each do |location|
+          sr_location = springboard[:locations].filter('$or' => [{public_id: location}, {name: location}]).first
+          springboard[:stations].post!(location_id: sr_location.id, active: true, name: 'Station 1')
         end
         SRDM::LOG.info "Successfully created #{locations_missing_stations.count} stations"
       end
