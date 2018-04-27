@@ -43,6 +43,7 @@ module SRDM
 
       def gift_card_number(gift_card)
         return gift_card.gsub(/\W/, '') if @system.include?('lightspeed')
+        return "C#{gift_card}" if @system.include?('celerant')
         gift_card
       end
 
@@ -52,11 +53,16 @@ module SRDM
 
       def processed_list(chunk)
         return lightspeed_processed_chunk(chunk) if @system.include?('lightspeed')
+        return celerant_processed_chunk(chunk) if @system.include?('celerant')
         chunk
       end
 
       def lightspeed_processed_chunk(chunk)
         chunk.map { |e| "#{e[0]}-#{e[1..-1]}" }
+      end
+
+      def celerant_processed_chunk(chunk)
+        chunk.reject { |e| e[0] != 'C' }.map { |e| e[1..-1] }
       end
 
       def cust_resource(chunk)
