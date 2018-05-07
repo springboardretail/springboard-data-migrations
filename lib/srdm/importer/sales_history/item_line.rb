@@ -1,7 +1,7 @@
 module SRDM
   module Importer
     class ItemLine
-      attr_reader :line, :original_price, :unit_price, :qty
+      attr_reader :line, :unit_price, :qty
 
       def initialize(line)
         @line = line
@@ -34,10 +34,15 @@ module SRDM
         $account.default_item.public_id
       end
 
+      def original_price
+        oprice = line['original_price'] || line['original_unit_price']
+        return nil if oprice.nil?
+        BigDecimal.new(oprice)
+      end
+
       private
 
       def process_line_details
-        @original_price = BigDecimal.new(line['original_price']) if line['original_price']
         @unit_price = BigDecimal.new(line['unit_price'])
         @qty = line['qty'].to_f
       end
