@@ -88,6 +88,7 @@ module SRDM
         @use_cache = options[:use_cache]
         @refresh_cache = options[:refresh_cache]
         @skip_ticket_download = options[:skip_ticket_download]
+        @skip_prompts = options[:skip_prompts]
         @import_start_time = options[:import_start_time].to_i if options[:import_start_time]
         @import_end_time = options[:import_end_time].to_i if options[:import_end_time]
       end
@@ -121,7 +122,7 @@ module SRDM
         if locations_missing_stations.count > 0
           SRDM::LOG.warn "Missing stations in the following locations #{locations_missing_stations.to_a}"
           puts 'Would you like me to create the stations? (y/n)'
-          if STDIN.gets.chomp.to_s.strip.downcase == 'y'
+          if @skip_prompts || STDIN.gets.chomp.to_s.strip.downcase == 'y'
             create_stations(locations_missing_stations)
             $account.refresh_locations_and_stations
           else
@@ -232,7 +233,7 @@ module SRDM
                          'disable featuer flag for import'
           SRDM::LOG.warn warning_text
           puts 'Would you like to continue importing without sales reps? (y/n)'
-          abort('Aborted by user') unless STDIN.gets.chomp.to_s.downcase.strip == 'y'
+          abort('Aborted by user') unless @skip_prompts || STDIN.gets.chomp.to_s.downcase.strip == 'y'
         end
       end
     end

@@ -37,6 +37,7 @@ command [:import, :importer] do |c|
   c.command [:sales_history, :sales, :tickets] do |sc|
     sc.switch [:t, :skip_ticket_download], desc: 'Skips downloading tickets assuming all tickets on import file are new'
     sc.switch [:r, :refresh_cache], desc: 'Forces a re-download of cached resources'
+    sc.switch [:p, :skip_prompt], desc: 'Automatically answers Yes to all prompts allowing for a headless run'
     sc.flag [:f, :file], desc: 'Set the import file', required: true
     sc.flag(
       [:s, :import_start_time],
