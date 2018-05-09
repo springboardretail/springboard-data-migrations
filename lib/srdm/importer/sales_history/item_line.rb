@@ -11,7 +11,7 @@ module SRDM
       def to_h
         line_details = {
           type: 'ItemLine',
-          item_lookup: item_lookup,
+          item_id: item_id,
           unit_price: unit_price.to_f,
           qty: qty.to_i
         }
@@ -26,6 +26,12 @@ module SRDM
 
       def description
         @description ||= line['description']
+      end
+
+      def item_id
+        return $account.items[line['item_lookup']] if $account.items[line['item_lookup']]
+        @description = line['description'] || line['item_lookup']
+        $account.default_item.id
       end
 
       def item_lookup

@@ -40,7 +40,7 @@ module SRDM
           @springboard,
           use_cache: @use_cache,
           refresh_cache: @refresh_cache
-        ).to_set
+        ).to_h
       end
 
       def tickets

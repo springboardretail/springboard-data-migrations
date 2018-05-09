@@ -23,7 +23,7 @@ module SRDM
         {
           public_id: ticket_number,
           station_id: station_id,
-          customer_public_id: customer_public_id,
+          customer_id: customer_id,
           created_at: completed_at,
           completed_at: completed_at,
           sales_rep: sales_rep,
@@ -47,6 +47,11 @@ module SRDM
         rescue
           raise RuntimeError, "Station missing for location #{location_public_id}"
         end
+      end
+
+      def customer_id
+        return $account.customers[@customer_number] if $account.customers[@customer_number]
+        $account.default_customer.id
       end
 
       def customer_public_id
