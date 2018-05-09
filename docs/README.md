@@ -4,7 +4,6 @@ Each tutorial will provide you with the desired layout for the import file as we
 ### [Vendors](vendors.md)
 ### [Items](items.md)
 ### [Customers](customers.md)
-### [Sales History](sales_history.md)
 ### [Gift Cards](gift_cards.md)
 ### [Purchase Orders](purchase_orders.md)
 ### [Inventory Qtys](inventory_qtys.md)

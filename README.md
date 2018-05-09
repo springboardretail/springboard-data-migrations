@@ -10,10 +10,15 @@ Provides instructions for desired file formatting, import processes, and example
 ## Import tools
 The `srdm` import tool was created to give you a single program that can be used to import certain resources more efficiently into Springboard Retail using the API. Support for this tool will continue to grow and new features will be added over time. All tools below must be run from the root directory of the toolset.
 
+### Prerequisites:
+- Ruby >= 2.3
+- [Bundler](http://bundler.io/)
+
 ### Installation
+
 1. Clone this repository onto the machine that you wish to run the imports on.
-2. Make sure you have bundler installed `gem install bundler`
-3. Navigate to the cloned directory on your computer and run `bundle install`
+2. Navigate to the cloned directory on your computer and run `bundle install`
+3. Test to make sure it installed by running `$ ./srdm -h`
 
 ### Configuration
 Each tenant requires their own config file to store their subdomain and login token. This config file is a YAML file so an example file was provided [/examples/config.yaml](./examples/config.yaml)
