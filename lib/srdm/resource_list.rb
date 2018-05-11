@@ -91,14 +91,18 @@ module SRDM
 
     def download
       LOG.debug "Downloading #{resource_name}"
-      downloaded_resource = resource.each_with_object({}) do |thing, hash|
-        hash[thing[lookup_key]] = thing[value_key]
-        if alt_lookups
-          alt_lookup_fields.each do |field_key|
-            hash[thing['custom'][field_key]] = thing[value_key] if thing['custom'][field_key]
+      begin
+        downloaded_resource = resource.each_with_object({}) do |thing, hash|
+          hash[thing[lookup_key]] = thing[value_key]
+          if alt_lookups
+            alt_lookup_fields.each do |field_key|
+              hash[thing['custom'][field_key]] = thing[value_key] if thing['custom'][field_key]
+            end
           end
+          bar.increment! if bar
         end
-        bar.increment! if bar
+      rescue
+        retry
       end
       save_cache(downloaded_resource) if use_cache
       downloaded_resource

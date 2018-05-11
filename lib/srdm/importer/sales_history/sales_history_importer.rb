@@ -9,7 +9,7 @@ module SRDM
     class SalesHistoryImporter
       include ErrorHelpers
 
-      MAX_RETRIES = 3
+      MAX_RETRIES = 5
       DEFAULT_OPTIONS = {
         skip_ticket_download: false,
         refresh_cache: false,
