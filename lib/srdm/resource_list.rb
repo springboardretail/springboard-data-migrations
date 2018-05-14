@@ -33,7 +33,11 @@ module SRDM
     end
 
     def resource
-      springboard[resource_path].query(per_page: 500).sort(:id)
+      if @ticket_filter && @resource_name == 'tickets'
+        springboard[resource_path].filter(@ticket_filter).sort(:id).query(per_page: 500)
+      else
+        springboard[resource_path].sort(:id).query(per_page: 500)
+      end
     end
 
     def count
@@ -49,6 +53,7 @@ module SRDM
       @alt_lookups = options[:alt_lookups] || true
       @show_bar = options[:show_bar] || true
       @refresh_cache = options[:refresh_cache] || false
+      @ticket_filter = options[:ticket_filter]
     end
 
     def collect_values
@@ -89,7 +94,7 @@ module SRDM
       fields.map { |field| field['key'] }
     end
 
-    def filtered_resource(last_id, &blk)
+    def id_filtered_resource(last_id, &blk)
       resource.filter(id: { '$gt' => last_id }).each { |thing| yield thing }
     end
 
@@ -98,7 +103,7 @@ module SRDM
       last_id_downloaded = 0
       downloaded_records = {}
       begin
-        filtered_resource(last_id_downloaded) do |thing|
+        id_filtered_resource(last_id_downloaded) do |thing|
           downloaded_records[thing[lookup_key]] = thing[value_key]
           if alt_lookups
             alt_lookup_fields.each do |field_key|

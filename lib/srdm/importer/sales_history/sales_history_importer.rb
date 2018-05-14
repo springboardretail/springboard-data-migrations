@@ -37,9 +37,10 @@ module SRDM
 
       def import
         process_import_file
+        check_for_stations_and_locations
+        download_existing_tickets
         build_tickets
         check_for_duplicate_tickets
-        check_for_stations
         check_for_v2_sales_rep_feature ## Temp needed until API bug for v2 sales rep is fixed
         $account.create_defaults
         wait_until_import_is_ready_to_start
@@ -113,12 +114,15 @@ module SRDM
         DuplicateTicketChecker.new(tickets).check!
       end
 
-      def check_for_stations
+      def check_for_stations_and_locations
+        location_ids = Set.new
         locations_missing_stations = Set.new
-        tickets.each do |ticket|
-          location = $account.locations_and_stations[ticket.location_public_id]
+        @location_public_ids.each do |location_public_id|
+          location = $account.locations_and_stations[location_public_id]
+          location_ids << location['id']
           locations_missing_stations << ticket.location_public_id unless location && location['stations'].count > 0
         end
+        $account.ticket_filter = { source_location_id: { '$in' => location_ids.to_a }}
         if locations_missing_stations.count > 0
           SRDM::LOG.warn "Missing stations in the following locations #{locations_missing_stations.to_a}"
           puts 'Would you like me to create the stations? (y/n)'
@@ -209,8 +213,10 @@ module SRDM
       def process_import_file
         SRDM::LOG.info 'Processing sales history import file'
         bar = ProgressBar.new @import_file.count
+        @location_public_ids = Set.new
         import_file.each do |line|
           ticket_lines[ticket_key(line)] << line
+          @location_public_ids << line['location_public_id']
           bar.increment!
         end
       end
@@ -222,6 +228,10 @@ module SRDM
           line['local_completed_at'],
           line['customer_public_id']
         ].join('-')
+      end
+
+      def download_existing_tickets
+        $account.tickets
       end
 
       ## Temp needed until API bug for v2 sales rep is fixed

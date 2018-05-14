@@ -44,12 +44,22 @@ module SRDM
       end
 
       def tickets
-        @tickets ||= SRDM::ResourceList.new(
+        @tickets ||= _ticket_set
+      end
+
+      def _ticket_set
+        return Set.new if @skip_tickets
+        SRDM::ResourceList.new(
           'sales/tickets',
           @springboard,
           use_cache: @ticket_cache,
-          refresh_cache: @refresh_cache
+          refresh_cache: @refresh_cache,
+          ticket_filter: @ticket_filter
         ).to_set
+      end
+
+      def ticket_filter=(filter)
+        @ticket_filter = filter        
       end
 
       def payment_type_id
@@ -82,11 +92,6 @@ module SRDM
       def download_initial_resources
         items
         customers
-        if @skip_tickets
-          @tickets = Set.new
-        else
-          tickets
-        end
       end
 
       def find_or_create_default_item
