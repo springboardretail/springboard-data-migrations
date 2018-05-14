@@ -226,6 +226,7 @@ module SRDM
 
       ## Temp needed until API bug for v2 sales rep is fixed
       def check_for_v2_sales_rep_feature
+        return if @skip_prompts
         feature_flags = springboard[:settings]['springboard.feature_flags'].get.body
         if feature_flags['value']['sales_reps'] == true
           warning_text = "#{SRDM.subdomain} has Sales Rep V2 featuer flag enabled. This will cause all sales reps" \
@@ -233,7 +234,7 @@ module SRDM
                          'disable featuer flag for import'
           SRDM::LOG.warn warning_text
           puts 'Would you like to continue importing without sales reps? (y/n)'
-          abort('Aborted by user') unless @skip_prompts || STDIN.gets.chomp.to_s.downcase.strip == 'y'
+          abort('Aborted by user') unless STDIN.gets.chomp.to_s.downcase.strip == 'y'
         end
       end
     end
