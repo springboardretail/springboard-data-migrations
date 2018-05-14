@@ -22,7 +22,11 @@ module SRDM
       end
 
       def err_has_response_body?(err)
-        err.respond_to?(:response) && err.response.respond_to?(:body)
+        begin
+          return true if err.response.body
+        rescue
+          return false
+        end
       end
     end
   end
