@@ -33,7 +33,7 @@ module SRDM
     end
 
     def resource
-      springboard[resource_path].query(per_page: 500)
+      springboard[resource_path].query(per_page: 500).sort(:id)
     end
 
     def count
@@ -89,23 +89,30 @@ module SRDM
       fields.map { |field| field['key'] }
     end
 
+    def filtered_resource(last_id, &blk)
+      resource.filter(id: { '$gt' => last_id }).each { |thing| yield thing }
+    end
+
     def download
       LOG.debug "Downloading #{resource_name}"
+      last_id_downloaded = 0
+      downloaded_records = {}
       begin
-        downloaded_resource = resource.each_with_object({}) do |thing, hash|
-          hash[thing[lookup_key]] = thing[value_key]
+        filtered_resource(last_id_downloaded) do |thing|
+          downloaded_records[thing[lookup_key]] = thing[value_key]
           if alt_lookups
             alt_lookup_fields.each do |field_key|
-              hash[thing['custom'][field_key]] = thing[value_key] if thing['custom'][field_key]
+              downloaded_records[thing['custom'][field_key]] = thing[value_key] if thing['custom'][field_key]
             end
           end
+          last_id_downloaded = thing.id
           bar.increment! if bar
         end
       rescue
         retry
       end
-      save_cache(downloaded_resource) if use_cache
-      downloaded_resource
+      save_cache(downloaded_records) if use_cache
+      downloaded_records
     end
   end
 end
