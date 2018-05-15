@@ -36,18 +36,23 @@ module SRDM
       end
 
       def import
-        process_import_file
-        check_for_stations_and_locations
-        download_existing_tickets
-        build_tickets
-        check_for_duplicate_tickets
-        check_for_v2_sales_rep_feature ## Temp needed until API bug for v2 sales rep is fixed
-        $account.create_defaults
-        wait_until_import_is_ready_to_start
         begin
-          import_tickets
-        ensure
-          wrap_up_import
+          process_import_file
+          check_for_stations_and_locations
+          download_existing_tickets
+          build_tickets
+          check_for_duplicate_tickets
+          check_for_v2_sales_rep_feature ## Temp needed until API bug for v2 sales rep is fixed
+          $account.create_defaults
+          wait_until_import_is_ready_to_start
+          begin
+            import_tickets
+          ensure
+            wrap_up_import
+          end
+        rescue => err
+          SRDM::LOG.error "Unknown error occurred: #{err}"
+          STDERR.puts err.backtrace
         end
       end
 
@@ -120,7 +125,7 @@ module SRDM
         @location_public_ids.each do |location_public_id|
           location = $account.locations_and_stations[location_public_id]
           location_ids << location['id']
-          locations_missing_stations << ticket.location_public_id unless location && location['stations'].count > 0
+          locations_missing_stations << location_public_id unless location && location['stations'].count > 0
         end
         $account.ticket_filter = { source_location_id: { '$in' => location_ids.to_a }}
         if locations_missing_stations.count > 0
