@@ -33,11 +33,7 @@ module SRDM
     end
 
     def resource
-      if @ticket_filter && @resource_name == 'tickets'
-        springboard[resource_path].filter(@ticket_filter).sort(:id).query(per_page: 500)
-      else
-        springboard[resource_path].sort(:id).query(per_page: 500)
-      end
+      @resource || _build_resource
     end
 
     def count
@@ -45,6 +41,27 @@ module SRDM
     end
 
     private
+
+    def _build_resource
+      r = springboard[resource_path].sort(:id)
+      r.query(per_page: resource_query_size)
+      resource_fields_needed.each { |field| r = r.query('select[]' => field) }
+      r = r.filter(@ticket_filter) if @ticket_filter && @resource_name == 'tickets'
+      r
+    end
+
+    def resource_fields_needed
+      return ['id', 'public_id', 'custom'] if @resource_name == 'items'
+      []
+    end
+
+    def resource_query_size
+      if @resource_name == 'items'
+        2500
+      else
+        500
+      end
+    end
 
     def init_options(options)
       @lookup_key = options[:lookup_key] || 'public_id'
