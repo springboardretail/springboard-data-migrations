@@ -44,19 +44,25 @@ module SRDM
 
     def _build_resource
       r = springboard[resource_path].sort(:id)
-      r.query(per_page: resource_query_size)
       resource_fields_needed.each { |field| r = r.query('select[]' => field) }
       r = r.filter(@ticket_filter) if @ticket_filter && @resource_name == 'tickets'
+      r = r.query(per_page: resource_query_size)
       r
     end
 
     def resource_fields_needed
-      return ['id', 'public_id', 'custom'] if @resource_name == 'items'
-      []
+      if @resource_name == 'items'
+        fields = ['id', 'public_id']
+        fields << 'custom' if alt_lookup_fields.count > 0
+        fields
+      else
+        []
+      end
     end
 
     def resource_query_size
       if @resource_name == 'items'
+        return 5000 if alt_lookup_fields.count.zero?
         2500
       else
         500
@@ -111,8 +117,8 @@ module SRDM
       fields.map { |field| field['key'] }
     end
 
-    def id_filtered_resource(last_id, &blk)
-      resource.filter(id: { '$gt' => last_id }).each { |thing| yield thing }
+    def id_filtered_resource(last_id)
+      resource.filter(id: { '$gt' => last_id })
     end
 
     def download
@@ -120,7 +126,7 @@ module SRDM
       last_id_downloaded = 0
       downloaded_records = {}
       begin
-        id_filtered_resource(last_id_downloaded) do |thing|
+        id_filtered_resource(last_id_downloaded).each do |thing|
           downloaded_records[thing[lookup_key]] = thing[value_key]
           if alt_lookups
             alt_lookup_fields.each do |field_key|
