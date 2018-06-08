@@ -44,24 +44,23 @@ module SRDM
 
     def _build_resource
       r = springboard[resource_path].sort(:id)
-      resource_fields_needed.each { |field| r = r.query('select[]' => field) }
+      resource_fields_needed.each { |field| r = r.query('_only[]' => field) }
       r = r.filter(@ticket_filter) if @ticket_filter && @resource_name == 'tickets'
       r = r.query(per_page: resource_query_size)
       r
     end
 
     def resource_fields_needed
-      if @resource_name == 'items'
-        fields = ['id', 'public_id']
+      return [] unless ['items', 'customers', 'tickets'].include?(@resource_name)
+      fields = ['id', 'public_id']
+      if @resource_name == 'items' || @resource_name == 'customers'
         fields << 'custom' if alt_lookup_fields.count > 0
-        fields
-      else
-        []
       end
+      fields
     end
 
     def resource_query_size
-      if @resource_name == 'items'
+      if ['items', 'customers', 'tickets'].include?(@resource_name)
         return 5000 if alt_lookup_fields.count.zero?
         2500
       else
