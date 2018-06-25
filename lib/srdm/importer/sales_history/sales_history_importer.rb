@@ -122,6 +122,7 @@ module SRDM
       def check_for_stations_and_locations
         location_ids = Set.new
         locations_missing_stations = Set.new
+        raise('Import file does not contain any values for location_public_id') unless @location_public_ids.count > 0
         @location_public_ids.each do |location_public_id|
           location = $account.locations_and_stations[location_public_id]
           location_ids << location['id']
