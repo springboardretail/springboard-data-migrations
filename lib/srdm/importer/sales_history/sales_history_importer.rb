@@ -244,11 +244,13 @@ module SRDM
         return if @skip_prompts
         feature_flags = springboard[:settings]['springboard.feature_flags'].get.body
         if feature_flags['value']['sales_reps'] == true
-          warning_text = "#{SRDM.subdomain} has Sales Rep V2 featuer flag enabled. This will cause all sales reps" \
-                         'to be ignored during the import. Contact Springboard Retail support rep to temporarily' \
-                         'disable featuer flag for import'
+          warning_text = "#{SRDM.subdomain} has Sales Rep V2 featuer flag enabled. This will cause all sales reps " \
+                         'to be matched to users in the Springboard account. If you are planning to proceed with this ' \
+                         'setting enabled, it is recommended to make sure all users are created first. If a matching user ' \
+                         'is not found, the sales rep will be set to "Unknown(Rep Name)". Contact Springboard Retail to ' \
+                         'disable the featuer flag to use the legacy sales rep feature not linked to users.'
           SRDM::LOG.warn warning_text
-          puts 'Would you like to continue importing without sales reps? (y/n)'
+          puts 'Would you like to continue importing with these sales rep limitations? (y/n)'
           abort('Aborted by user') unless STDIN.gets.chomp.to_s.downcase.strip == 'y'
         end
       end

@@ -42,7 +42,8 @@ module SRDM
       end
 
       def gift_card_number(gift_card)
-        return gift_card.gsub(/\W/, '') if @system.include?('lightspeed')
+        return gift_card.gsub(/\W/, '') if @system.include?('light') && @system.include?('speed')
+        return "C-#{gift_card}" if @system.include?('file') && @system.include?('maker')
         return "C#{gift_card}" if @system.include?('celerant')
         gift_card
       end
@@ -52,13 +53,18 @@ module SRDM
       end
 
       def processed_list(chunk)
-        return lightspeed_processed_chunk(chunk) if @system.include?('lightspeed')
+        return lightspeed_processed_chunk(chunk) if @system.include?('light') && @system.include?('speed')
+        return filemaker_processed_chunk(chunk) if @system.include?('file') && @system.include?('maker')
         return celerant_processed_chunk(chunk) if @system.include?('celerant')
         chunk
       end
 
       def lightspeed_processed_chunk(chunk)
         chunk.map { |e| "#{e[0]}-#{e[1..-1]}" }
+      end
+
+      def filemaker_processed_chunk(chunk)
+        chunk.map { |e| e[2..-1] }
       end
 
       def celerant_processed_chunk(chunk)
