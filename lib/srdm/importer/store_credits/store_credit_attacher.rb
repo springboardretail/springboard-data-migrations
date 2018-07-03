@@ -7,8 +7,9 @@ module SRDM
         @field_name = field_name
         @springboard = client
         @system = options[:system].to_s.strip.downcase
+        @import_set_id = options[:import_set_id]
         @attach_count = 0
-        @gift_cards = ResourceList.new('gift_cards', client, alt_lookups: false, lookup_key: 'number').to_set
+        download_gift_cards
       end
 
       def attach
@@ -48,6 +49,11 @@ module SRDM
         gift_card
       end
 
+      def download_gift_cards
+        options = { alt_lookups: false, lookup_key: 'number' }
+        options[:custom_filter] = { import_set_id: @import_set_id } if @import_set_id
+        @gift_cards = ResourceList.new('gift_cards', springboard, options).to_set
+      end
       def customers_with_card_number(card_list)
         cust_resource(card_list).each_with_object({}) { |cust, hash| hash[cust['public_id']] = cust['id']}
       end

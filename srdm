@@ -65,6 +65,7 @@ command [:import, :importer] do |c|
   c.command [:attach_store_credits, :credits, :store_credits] do |sc|
     sc.flag [:f, :field_name], desc: 'Set the store credit field name', default_value: 'Store Credit #'
     sc.flag [:s, :system], desc: 'Specify source system for special consideration (ex: Lightspeed)'
+    sc.flag [:i, :import_set_id], desc: 'Specify the import set ID for the store credit import'
     sc.action do |global_options,options,args|
       SRDM::Importer.attach_store_credits(options)
     end

@@ -45,22 +45,24 @@ module SRDM
     def _build_resource
       r = springboard[resource_path].sort(:id)
       resource_fields_needed.each { |field| r = r.query('_only[]' => field) }
-      r = r.filter(@ticket_filter) if @ticket_filter && @resource_name == 'tickets'
+      r = r.filter(@custom_filter) if @custom_filter
       r = r.query(per_page: resource_query_size)
       r
     end
 
     def resource_fields_needed
-      return [] unless ['items', 'customers', 'tickets'].include?(@resource_name)
-      fields = ['id', 'public_id']
-      if @resource_name == 'items' || @resource_name == 'customers'
+      fields = []
+      fields << ['id', 'public_id'] if ['items', 'customers', 'tickets'].include?(resource_name)
+      if resource_name == 'items' || resource_name == 'customers'
         fields << 'custom' if alt_lookup_fields.count > 0
+      elsif resource_name == 'gift_cards'
+        fields << ['id', 'number', 'balance']
       end
       fields
     end
 
     def resource_query_size
-      if ['items', 'customers', 'tickets'].include?(@resource_name)
+      if ['items', 'customers', 'tickets'].include?(resource_name)
         return 5000 if alt_lookup_fields.count.zero?
         2500
       else
@@ -75,7 +77,7 @@ module SRDM
       @alt_lookups = options[:alt_lookups] || true
       @show_bar = options[:show_bar] || true
       @refresh_cache = options[:refresh_cache] || false
-      @ticket_filter = options[:ticket_filter]
+      @custom_filter = options[:custom_filter]
     end
 
     def collect_values

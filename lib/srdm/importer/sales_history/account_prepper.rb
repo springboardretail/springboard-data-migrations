@@ -54,12 +54,12 @@ module SRDM
           @springboard,
           use_cache: @ticket_cache,
           refresh_cache: @refresh_cache,
-          ticket_filter: @ticket_filter
+          custom_filter: @custom_filter
         ).to_set
       end
 
-      def ticket_filter=(filter)
-        @ticket_filter = filter        
+      def custom_filter=(filter)
+        @custom_filter = filter        
       end
 
       def payment_type_id
