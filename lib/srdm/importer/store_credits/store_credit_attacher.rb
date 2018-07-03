@@ -10,6 +10,7 @@ module SRDM
         @import_set_id = options[:import_set_id]
         @attach_count = 0
         download_gift_cards
+        download_customers if @system.include?('counter') && @system.include?('point')
       end
 
       def attach
@@ -54,8 +55,26 @@ module SRDM
         options[:custom_filter] = { import_set_id: @import_set_id } if @import_set_id
         @gift_cards = ResourceList.new('gift_cards', springboard, options).to_set
       end
+
+      def download_customers
+        @customers = ResourceList.new('customers', springboard, alt_lookups: false).to_h
+      end
+
       def customers_with_card_number(card_list)
-        cust_resource(card_list).each_with_object({}) { |cust, hash| hash[cust['public_id']] = cust['id']}
+        if @customers
+          card_list.each_with_object({}) { |e, hash| hash[e] = processed_customer_list[e] if processed_customer_list[e] }
+        else
+          cust_resource(card_list).each_with_object({}) { |cust, hash| hash[cust['public_id']] = cust['id']}
+        end
+      end
+
+      def processed_customer_list
+        @processed_customer_list ||= _processed_customer_list
+      end
+
+      def _processed_customer_list
+        return counterpoint_processed_customer_list if @system.include?('counter') && @system.include?('point')
+        @customers
       end
 
       def processed_list(chunk)
@@ -77,8 +96,15 @@ module SRDM
         chunk.reject { |e| e[0] != 'C' }.map { |e| e[1..-1] }
       end
 
+      def counterpoint_processed_customer_list
+        @customers.each_with_object({}) do |(public_id, id), hash|
+          processed_public_id = public_id.delete('-').delete(' ').delete('.').delete('_').delete("'")
+          hash[processed_public_id] = id
+        end
+      end
+
       def cust_resource(chunk)
-        springboard[:customers].filter(public_id: {'$in' => chunk})
+        springboard[:customers].filter(public_id: {'$in' => chunk}).query('_only' => 'public_id')
       end
 
       def find_or_create_custom_field
