@@ -56,6 +56,10 @@ module SRDM
         end
       end
 
+      def tickets
+        @tickets ||= build_tickets
+      end
+
       private
 
       def import_tickets
@@ -111,10 +115,6 @@ module SRDM
         end
       end
 
-      def tickets
-        @tickets ||= build_tickets
-      end
-
       def check_for_duplicate_tickets
         DuplicateTicketChecker.new(tickets).check!
       end
@@ -125,10 +125,11 @@ module SRDM
         raise('Import file does not contain any values for location_public_id') unless @location_public_ids.count > 0
         @location_public_ids.each do |location_public_id|
           location = $account.locations_and_stations[location_public_id]
+          raise("Missing Location # #{location_public_id}") if location.nil?
           location_ids << location['id']
           locations_missing_stations << location_public_id unless location && location['stations'].count > 0
         end
-        $account.ticket_filter = { source_location_id: { '$in' => location_ids.to_a }}
+        $account.custom_filter = { source_location_id: { '$in' => location_ids.to_a }}
         if locations_missing_stations.count > 0
           SRDM::LOG.warn "Missing stations in the following locations #{locations_missing_stations.to_a}"
           puts 'Would you like me to create the stations? (y/n)'

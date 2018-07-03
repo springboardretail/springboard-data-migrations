@@ -21,6 +21,10 @@ module SRDM
     @subdomain ||= SRDM.config.sr_subdomain
   end
 
+  def SRDM.subdomain=(subdomain)
+    @subdomain = subdomain
+  end
+
   def SRDM.client
     @client ||= create_client
   end
