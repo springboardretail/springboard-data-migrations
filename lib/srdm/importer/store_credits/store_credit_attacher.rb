@@ -104,7 +104,7 @@ module SRDM
       end
 
       def cust_resource(chunk)
-        springboard[:customers].filter(public_id: {'$in' => chunk}).query('_only' => 'public_id')
+        springboard[:customers].filter(public_id: {'$in' => chunk}).query('_only' => ['id', 'public_id'])
       end
 
       def find_or_create_custom_field
