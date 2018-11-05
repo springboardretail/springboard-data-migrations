@@ -50,7 +50,7 @@ module SRDM
       private
 
       def process_line_details
-        @unit_price = BigDecimal.new(line['unit_price'])
+        @unit_price = BigDecimal.new(line['unit_price'].to_s)
         @qty = line['qty'].to_f
       end
     end
