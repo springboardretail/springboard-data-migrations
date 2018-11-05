@@ -122,13 +122,18 @@ module SRDM
       def check_for_stations_and_locations
         location_ids = Set.new
         locations_missing_stations = Set.new
+        missing_locations = Set.new
         raise('Import file does not contain any values for location_public_id') unless @location_public_ids.count > 0
         @location_public_ids.each do |location_public_id|
           location = $account.locations_and_stations[location_public_id]
-          raise("Missing Location # #{location_public_id}") if location.nil?
-          location_ids << location['id']
-          locations_missing_stations << location_public_id unless location && location['stations'].count > 0
+          if location.nil?
+            missing_locations << location_public_id
+          else
+            location_ids << location['id']
+            locations_missing_stations << location_public_id unless location && location['stations'].count > 0
+          end
         end
+        raise("Missing Locations #{missing_locations}") if missing_locations.count > 0
         $account.custom_filter = { source_location_id: { '$in' => location_ids.to_a }}
         if locations_missing_stations.count > 0
           SRDM::LOG.warn "Missing stations in the following locations #{locations_missing_stations.to_a}"
