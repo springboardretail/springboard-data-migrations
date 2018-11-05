@@ -30,6 +30,7 @@ module SRDM
 
       def item_id
         return $account.items[line['item_lookup']] if $account.items[line['item_lookup']]
+        return $account.items[line['item_lookup'].to_s.strip] if $account.items[line['item_lookup'].to_s.strip]
         @description = line['description'] || line['item_lookup']
         $account.default_item.id
       end
