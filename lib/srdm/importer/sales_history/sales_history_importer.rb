@@ -65,6 +65,7 @@ module SRDM
       def import_tickets
         bar = ProgressBar.new tickets.count
         when_ready_to_import do
+          SRDM::LOG.info 'Beginning ticket import'
           tickets.each do |ticket|
             @ticket_count += 1
             import_ticket(ticket)
@@ -83,7 +84,6 @@ module SRDM
         if @import_start_time && !@valid_import_hours.include?(Time.now.hour)
           SRDM::LOG.warn "Waiting until #{@import_start_time}:00 to begin the import"
         end
-        when_ready_to_import { SRDM::LOG.info 'Beginning ticket import' }
       end
 
       def when_ready_to_import(&blk)
