@@ -7,6 +7,7 @@ This will import sales history as completed POS tickets
 * `-r` Refresh downloaded cache for customers and items. Use if data has been updated in the account since last run
 * `-s` Start time for scheduled imports. Only use if customer is live and has required POS fields
 * `-e` End time for scheduled imports. Use only if `-s` is specified
+* `-c` Specifies the import to happen in chronological order. By default newest tickets are imported first
 
 ## Running import
 

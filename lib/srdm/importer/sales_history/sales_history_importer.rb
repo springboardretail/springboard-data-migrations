@@ -99,6 +99,7 @@ module SRDM
         @refresh_cache = options[:refresh_cache]
         @skip_ticket_download = options[:skip_ticket_download]
         @skip_prompts = options[:skip_prompts]
+        @chronological_order = options[:chronological_order]
         @import_start_time = options[:import_start_time].to_i if options[:import_start_time]
         @import_end_time = options[:import_end_time].to_i if options[:import_end_time]
       end
@@ -166,7 +167,9 @@ module SRDM
       end
 
       def sorted_ticket_lines
-        @ticket_lines.sort_by { |_key, lines| lines.first['local_completed_at'] }.reverse
+        sorted_lines = @ticket_lines.sort_by { |_key, lines| lines.first['local_completed_at'] }
+        return sorted_lines if @chronological_order
+        sorted_lines.reverse
       end
 
       def needs_import?(ticket)

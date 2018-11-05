@@ -38,6 +38,7 @@ command [:import, :importer] do |c|
     sc.switch [:t, :skip_ticket_download], desc: 'Skips downloading tickets assuming all tickets on import file are new'
     sc.switch [:r, :refresh_cache], desc: 'Forces a re-download of cached resources'
     sc.switch [:p, :skip_prompts], desc: 'Automatically answers Yes to all prompts allowing for a headless run'
+    sc.switch [:c, :chronological_order], desc: 'Imports in chronological order rather than newest first'
     sc.flag [:f, :file], desc: 'Set the import file', required: true
     sc.flag(
       [:s, :import_start_time],
