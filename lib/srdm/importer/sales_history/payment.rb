@@ -8,7 +8,7 @@ module SRDM
       def initialize(ticket, lines)
         @ticket = ticket
         @lines = lines
-        @total_payment = BigDecimal.new(0)
+        @total_payment = BigDecimal(0)
         process_lines
       end
 

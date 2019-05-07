@@ -25,7 +25,7 @@ module SRDM
       private
 
       def process_line_details
-        @amount = BigDecimal.new(line['tax'])
+        @amount = BigDecimal(line['tax'])
       end
     end
   end

@@ -44,13 +44,13 @@ module SRDM
       def original_price
         oprice = line['original_price'] || line['original_unit_price']
         return nil if oprice.nil?
-        BigDecimal.new(oprice)
+        BigDecimal(oprice)
       end
 
       private
 
       def process_line_details
-        @unit_price = BigDecimal.new(line['unit_price'].to_s)
+        @unit_price = BigDecimal(line['unit_price'].to_s)
         @qty = line['qty'].to_f
       end
     end
