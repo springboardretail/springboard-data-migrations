@@ -42,7 +42,6 @@ module SRDM
           download_existing_tickets
           build_tickets
           check_for_duplicate_tickets
-          check_for_v2_sales_rep_feature ## Temp needed until API bug for v2 sales rep is fixed
           $account.create_defaults
           wait_until_import_is_ready_to_start
           begin
@@ -247,22 +246,6 @@ module SRDM
 
       def download_existing_tickets
         $account.tickets
-      end
-
-      ## Temp needed until API bug for v2 sales rep is fixed
-      def check_for_v2_sales_rep_feature
-        return if @skip_prompts
-        feature_flags = springboard[:settings]['springboard.feature_flags'].get.body
-        if feature_flags['value']['sales_reps'] == true
-          warning_text = "#{SRDM.subdomain} has Sales Rep V2 featuer flag enabled. This will cause all sales reps " \
-                         'to be matched to users in the Springboard account. If you are planning to proceed with this ' \
-                         'setting enabled, it is recommended to make sure all users are created first. If a matching user ' \
-                         'is not found, the sales rep will be set to "Unknown(Rep Name)". Contact Springboard Retail to ' \
-                         'disable the featuer flag to use the legacy sales rep feature not linked to users.'
-          SRDM::LOG.warn warning_text
-          puts 'Would you like to continue importing with these sales rep limitations? (y/n)'
-          abort('Aborted by user') unless STDIN.gets.chomp.to_s.downcase.strip == 'y'
-        end
       end
     end
   end
