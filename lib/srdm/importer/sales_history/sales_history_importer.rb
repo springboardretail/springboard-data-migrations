@@ -15,11 +15,14 @@ module SRDM
         refresh_cache: false,
         use_cache: true
       }
+      REQUIRED_FILE_HEADERS = ['ticket_number', 'local_completed_at', 'location_public_id', 'item_lookup', 'unit_price', 'qty', 'tax']
+      EXTRA_FILE_HEADERS = ['customer_public_id', 'sales_rep', 'tax', 'original_price']
 
       attr_reader :import_file, :springboard, :ticket_lines, :ticket_count, :success_count
 
       def initialize(sales_history_file, client, options = {})
         @import_file = CSVParser.new(sales_history_file)
+        check_import_file_headers
         @springboard = client
         parse_options(options)
         parse_valid_import_times
@@ -115,6 +118,21 @@ module SRDM
         end
       end
 
+      def check_import_file_headers
+        headers = import_file.headers
+        missing_headers = REQUIRED_FILE_HEADERS.each_with_object([]) do |header, arry|
+          arry << header unless headers.include?(header)
+        end
+        unknown_headers = headers - REQUIRED_FILE_HEADERS - EXTRA_FILE_HEADERS
+        if unknown_headers.count > 0
+          SRDM::LOG.warn "The import file contains unknown headers that will be ignored #{unknown_headers}"
+        end
+        if missing_headers.count > 0
+          SRDM::LOG.error "Missing required headers #{missing_headers}"
+          exit
+        end
+      end
+
       def check_for_duplicate_tickets
         DuplicateTicketChecker.new(tickets).check!
       end
@@ -133,7 +151,7 @@ module SRDM
             locations_missing_stations << location_public_id unless location && location['stations'].count > 0
           end
         end
-        raise("Missing Locations #{missing_locations}") if missing_locations.count > 0
+        raise("Missing Locations #{missing_locations.to_a}") if missing_locations.count > 0
         $account.custom_filter = { source_location_id: { '$in' => location_ids.to_a }}
         if locations_missing_stations.count > 0
           SRDM::LOG.warn "Missing stations in the following locations #{locations_missing_stations.to_a}"
