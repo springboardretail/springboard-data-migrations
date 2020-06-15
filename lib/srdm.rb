@@ -7,7 +7,7 @@ require_relative 'srdm/field_manager'
 require_relative 'srdm/resource_list'
 
 module SRDM
-  VERSION = '0.4.0'
+  VERSION = '0.4.1'
 
   LOG = Logger.new(STDOUT)
 
@@ -15,6 +15,7 @@ module SRDM
 
   def SRDM.load_config_file!(config_file)
     @config_file = YAML.load_file(config_file)
+    LOG.info "Loaded config file for subdomain \"#{self.subdomain}\""
   end
 
   def SRDM.subdomain
