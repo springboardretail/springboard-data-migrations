@@ -1,0 +1,7 @@
+PO #,PO Vendor #,PO Received at Location #,PO Start Ship,PO End Ship,Item #,Item Qty,Item Unit Cost
+123,Heartland Retail,1,09/01/2017,10/01/2017,100001,1,55
+123,Heartland Retail,1,09/01/2017,10/01/2017,100002,3,25
+123,Heartland Retail,1,09/01/2017,10/01/2017,100003,1,40
+456,Heartland Retail,2,09/15/2017,10/15/2017,100001,2,55
+789,Heartland Retail,3,10/01/2017,11/01/2017,100001,1,55
+789,Heartland Retail,3,10/01/2017,11/01/2017,100004,2,35

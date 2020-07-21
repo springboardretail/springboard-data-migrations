@@ -4,7 +4,7 @@ require './lib/srdm'
 
 include GLI::App
 
-program_desc 'A Springboard Retail data migration tool'
+program_desc 'A Heartland Retail data migration tool'
 version SRDM::VERSION
 subcommand_option_handling :normal
 
@@ -16,10 +16,10 @@ pre do |global_options,command,options,args|
 end
 
 desc 'Import'
-long_desc 'Imports various resources into Springboard Retail account'
+long_desc 'Imports various resources into Heartland Retail account'
 command [:import, :importer] do |c|
   c.desc 'Import inventory qtys'
-  c.long_desc "Imports a multi-location inventory qty import file into Springboard Retail.\n\n" \
+  c.long_desc "Imports a multi-location inventory qty import file into Heartland Retail.\n\n" \
               'The file must be prepared following the docs and then passed to this command.'
   c.command [:inventory_qtys, :inventory_qty, :counts, :inventory, :qtys] do |sc|
     sc.switch [:p, :resume_physical_counts], desc: 'Adds qtys to existing physical count in progress if available'
@@ -32,7 +32,7 @@ command [:import, :importer] do |c|
   end
 
   c.desc 'Import sales history'
-  c.long_desc "Imports sales history into Springboard Retail.\n\n" \
+  c.long_desc "Imports sales history into Heartland Retail.\n\n" \
               'The file must be prepared following the docs and then passed to this command.'
   c.command [:sales_history, :sales, :tickets] do |sc|
     sc.switch [:t, :skip_ticket_download], desc: 'Skips downloading tickets assuming all tickets on import file are new'
@@ -60,7 +60,7 @@ command [:import, :importer] do |c|
   end
 
   c.desc 'Attach store credit gift cards to customers'
-  c.long_desc "Matches gift cards in Springboard Retail to customers and adds card # to custom field.\n\n" \
+  c.long_desc "Matches gift cards in Heartland Retail to customers and adds card # to custom field.\n\n" \
               "The store credits must have been imported following the recommended configuration in the docs.\n\n" \
               'It will default to adding the card # in the field "Store Credit #", or you can pass a field.'
   c.command [:attach_store_credits, :credits, :store_credits] do |sc|

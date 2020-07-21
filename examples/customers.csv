@@ -1,4 +1,4 @@
-Customer #,First Name,Last Name,Address First Name,Address Last Name,Address Line 1,Address Line 2,Address City,Address State,Address Postal Code,Address Country,Address Phone,Email
-1,Derek,Stotz,Derek,Stotz,,,,,,,,
-2,Allen,Williams,Allen,Williams,,,,,,,,
-3,Springboard,Retail,Springboard,Retail,383 Dorchester Ave,Suite 240,Boston,MA,02127,US,888-347-2191,support@springboardretail.com
+Customer #,First Name,Last Name,Address First Name,Address Last Name,Address Line 1,Address Line 2,Address City,Address State,Address Postal Code,Address Country,Address Phone,Email,Active
+1,Derek,Stotz,Derek,Stotz,,,,,,,,,true
+2,Allen,Williams,Allen,Williams,,,,,,,,,true
+3,Heartland,Retail,Heartland,Retail,383 Dorchester Ave,Suite 240,Boston,MA,02127,US,888-347-2191,support@springboardretail.com,false

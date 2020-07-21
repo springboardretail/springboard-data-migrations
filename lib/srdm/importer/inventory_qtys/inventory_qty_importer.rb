@@ -5,11 +5,12 @@ require 'progress_bar'
 module SRDM
   module Importer
     class InventoryQtyImporter
-      attr_reader :import_file, :springboard, :options, :reason_name, :inventory_counts
+      LEGACY_HEADER_MAPPING = { 'Location #' => 'Location' }
+      attr_reader :import_file, :heartland, :options, :reason_name, :inventory_counts
 
       def initialize(inventory_qty_file, client, options)
-        @import_file = CSVParser.new(inventory_qty_file)
-        @springboard = client
+        @import_file = CSVParser.new(inventory_qty_file, header_mapping: LEGACY_HEADER_MAPPING)
+        @heartland = client
         @options = options
         @reason_name = options[:reason_code] || 'Initial Import'
         @inventory_counts = Hash.new { |hash, key| hash[key] = Hash.new(0) }
@@ -32,7 +33,7 @@ module SRDM
       def add_items_to_count(count, items)
         bar = ProgressBar.new items.count
         items.each do |item_num, qty|
-          count.add_line(item_num, qty)
+          count.add_line(item_num, qty) if qty > 0
           bar.increment!
         end
       end
@@ -40,9 +41,9 @@ module SRDM
       def physical_count(location)
         begin
           location_filter = {'$or' => [{name: location}, {public_id: location}]}
-          location_id = @springboard[:locations].filter(location_filter).first.id
+          location_id = @heartland[:locations].filter(location_filter).first.id
           PhysicalCount.new(
-            springboard,
+            heartland,
             location_id,
             reason_code,
             resume_existing_count: @options[:resume_physical_counts]
@@ -68,10 +69,10 @@ module SRDM
 
       def find_or_create_reason_code
         begin
-          existing_code = @springboard[:reason_codes][:inventory_adjustment_reasons].filter(name: reason_name).first
+          existing_code = @heartland[:reason_codes][:inventory_adjustment_reasons].filter(name: reason_name).first
           return existing_code.id if existing_code
           LOG.warn "Creating new inventory adjustment reason code #{reason_name}"
-          @springboard[:reason_codes][:inventory_adjustment_reasons].post(
+          @heartland[:reason_codes][:inventory_adjustment_reasons].post(
             name: reason_name,
             description: reason_name
           ).resource.get.body.id

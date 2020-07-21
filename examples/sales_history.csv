@@ -1,4 +1,4 @@
-ticket_number,customer_public_id,local_completed_at,sales_rep,location_public_id,tax,item_lookup,original_price,unit_price,qty
+Ticket #,Customer #,Completed At,Sales Rep,Location #,Tax Total,Item #,Item Original Price,Item Adjusted Unit Price,Qty
 12345,100001,2017-08-18T20:49:27+00:00,Derek,1,6.23,123456,,20,1
 12345,100001,2017-08-18T20:49:27+00:00,Derek,1,6.23,567890,,35.75,2
 12345,100001,2017-08-18T20:49:27+00:00,Derek,1,6.23,345678,50.99,44,1

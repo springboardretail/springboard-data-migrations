@@ -17,7 +17,7 @@ module SRDM
       }
 
       def initialize(client, use_cache: true, refresh_cache: false, ticket_cache: false, skip_tickets: false)
-        @springboard = client
+        @heartland = client
         @use_cache = use_cache
         @refresh_cache = refresh_cache
         @ticket_cache = ticket_cache
@@ -28,7 +28,7 @@ module SRDM
       def customers
         @customers ||= SRDM::ResourceList.new(
           'customers',
-          @springboard,
+          @heartland,
           use_cache: @use_cache,
           refresh_cache: @refresh_cache
         ).to_h
@@ -37,7 +37,7 @@ module SRDM
       def items
         @items ||= SRDM::ResourceList.new(
           'items',
-          @springboard,
+          @heartland,
           use_cache: @use_cache,
           refresh_cache: @refresh_cache
         ).to_h
@@ -51,7 +51,7 @@ module SRDM
         return Set.new if @skip_tickets
         SRDM::ResourceList.new(
           'sales/tickets',
-          @springboard,
+          @heartland,
           use_cache: @ticket_cache,
           refresh_cache: @refresh_cache,
           custom_filter: @custom_filter
@@ -59,7 +59,7 @@ module SRDM
       end
 
       def custom_filter=(filter)
-        @custom_filter = filter        
+        @custom_filter = filter
       end
 
       def payment_type_id
@@ -96,12 +96,12 @@ module SRDM
 
       def find_or_create_default_item
         begin
-          item = @springboard[:items].filter(public_id: 'MISC').first
+          item = @heartland[:items].filter(public_id: 'MISC').first
           return item if item
           SRDM::LOG.info 'Creating default "MISC" item'
-          custom_fields = FieldManager.new(@springboard, 'item', include_settings: false)
+          custom_fields = FieldManager.new(@heartland, 'item', include_settings: false)
           custom_fields.while_deactivated do
-            response = @springboard[:items].post(DEFAULT_ITEM_REQUEST_BODY)
+            response = @heartland[:items].post(DEFAULT_ITEM_REQUEST_BODY)
             raise response.raw_body unless response.success?
             return response.resource.get.body
           end
@@ -112,12 +112,12 @@ module SRDM
 
       def find_or_create_default_customer
         begin
-          customer = @springboard[:customers].filter(public_id: 'CASH').first
+          customer = @heartland[:customers].filter(public_id: 'CASH').first
           return customer if customer
           SRDM::LOG.info 'Creating default "CASH" customer'
-          custom_fields = FieldManager.new(@springboard, 'customer', include_settings: false)
+          custom_fields = FieldManager.new(@heartland, 'customer', include_settings: false)
           custom_fields.while_deactivated do
-            response = @springboard[:customers].post(DEFAULT_CUSTOMER_REQUEST_BODY)
+            response = @heartland[:customers].post(DEFAULT_CUSTOMER_REQUEST_BODY)
             raise response.raw_body unless response.success?
             return response.resource.get.body
           end
@@ -127,18 +127,18 @@ module SRDM
       end
 
       def find_locations_and_stations
-        @springboard[:locations].embed(:stations).each_with_object({}) do |location, hash|
+        @heartland[:locations].embed(:stations).each_with_object({}) do |location, hash|
           hash[location['public_id']] = location
           hash[location['name']] = location
         end
       end
 
       def find_or_create_payment_type
-        existing_payment_type = @springboard[:payment_types].filter(name: 'External').first
+        existing_payment_type = @heartland[:payment_types].filter(name: 'External').first
         return existing_payment_type.id if existing_payment_type
         SRDM::LOG.info "Creating custom payment type for imported tickets"
         begin
-          @springboard[:payment_types].post!(name: 'External').resource.get.body.id
+          @heartland[:payment_types].post!(name: 'External').resource.get.body.id
         rescue
           SRDM::LOG.error 'Failed to create custom payment type'
         end

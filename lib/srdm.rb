@@ -1,5 +1,5 @@
 require 'bundler/setup'
-require 'springboard-retail'
+require 'heartland-retail'
 require 'logger'
 require 'yaml'
 require_relative 'srdm/importer'
@@ -7,7 +7,7 @@ require_relative 'srdm/field_manager'
 require_relative 'srdm/resource_list'
 
 module SRDM
-  VERSION = '0.4.1'
+  VERSION = '1.0.0'
 
   LOG = Logger.new(STDOUT)
 
@@ -38,6 +38,6 @@ module SRDM
 
   def SRDM.create_client
     base_uri = "https://#{config.sr_subdomain}.myspringboard.us/api"
-    client = Springboard::Client.new(base_uri,token: config.sr_token)
+    client = HeartlandRetail::Client.new(base_uri,token: config.sr_token)
   end
 end

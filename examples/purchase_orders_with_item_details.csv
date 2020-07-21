@@ -1,0 +1,7 @@
+PO #,PO Vendor #,PO Received at Location #,PO Start Ship,PO End Ship,Item #,Item Qty,Item Unit Cost,Item Description,Item Cost,Item Current Price,Item Primary Vendor #
+123,Heartland Retail,1,9/1/17,10/1/17,100001,1,55,Derek Shoe - Black - 10,55,100,Heartland Retail
+123,Heartland Retail,1,9/1/17,10/1/17,100002,3,25,Derek Hat - Gray,25,50,Heartland Retail
+123,Heartland Retail,1,9/1/17,10/1/17,100003,1,40,Derek Pant - 30 x 32,40,80,Heartland Retail
+456,Heartland Retail,2,9/15/17,10/15/17,100001,2,55,Derek Shoe - Black - 10,55,100,Heartland Retail
+789,Heartland Retail,3,10/1/17,11/1/17,100001,1,55,Derek Shoe - Black - 10,55,100,Heartland Retail
+789,Heartland Retail,3,10/1/17,11/1/17,100004,2,35,Derek Sunglasses,35,70,Heartland Retail

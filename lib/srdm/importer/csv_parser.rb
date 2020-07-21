@@ -5,10 +5,11 @@ module SRDM
     class CSVParser
       attr_reader :file
 
-      def initialize(file, headers: true, encoding: 'BOM|UTF-8:UTF-8')
+      def initialize(file, headers: true, encoding: 'BOM|UTF-8:UTF-8', header_mapping: nil)
         @file = file
         @headers = headers
         @encoding = encoding
+        @header_mapping = header_mapping
         read_csv
       end
 
@@ -18,8 +19,18 @@ module SRDM
 
       private
 
+      def header_lambda
+        lambda do |header, field_info|
+          @header_mapping[header] || header
+        end
+      end
+
       def read_csv
-        @csv = CSV.read(@file, headers: @headers, encoding: @encoding)
+        if @header_mapping
+          csv = CSV.read( @file, headers: true, header_converters: header_lambda)
+        else
+          @csv = CSV.read(@file, headers: @headers, encoding: @encoding)
+        end
       end
     end
   end

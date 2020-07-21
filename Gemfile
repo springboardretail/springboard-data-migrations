@@ -2,10 +2,10 @@ source 'https://rubygems.org'
 
 gem 'gli'
 gem 'progress_bar'
-gem 'springboard-retail', '4.3.0'
+gem 'heartland-retail', '5.0.0'
 
 group :development do
   gem 'guard-rspec', require: false
-  gem 'pry'
+  gem 'pry', '~> 0.11.3'
   gem 'rspec'
 end

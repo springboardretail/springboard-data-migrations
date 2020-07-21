@@ -17,18 +17,30 @@ module SRDM
       }
       REQUIRED_FILE_HEADERS = ['ticket_number', 'local_completed_at', 'location_public_id', 'item_lookup', 'unit_price', 'qty', 'tax']
       EXTRA_FILE_HEADERS = ['customer_public_id', 'sales_rep', 'tax', 'original_price']
+      LEGACY_HEADER_MAPPING = {
+        'Ticket #' => 'ticket_number',
+        'Customer #' => 'customer_public_id',
+        'Completed At' => 'local_completed_at',
+        'Sales Rep' => 'sales_rep',
+        'Location #' => 'location_public_id',
+        'Tax Total' => 'tax',
+        'Item #' => 'item_lookup',
+        'Item Original Unit Price' => 'original_price',
+        'Item Adjusted Unit Price' => 'unit_price',
+        'Item Qty' => 'qty'
+      }
 
-      attr_reader :import_file, :springboard, :ticket_lines, :ticket_count, :success_count
+      attr_reader :import_file, :heartland, :ticket_lines, :ticket_count, :success_count
 
       def initialize(sales_history_file, client, options = {})
-        @import_file = CSVParser.new(sales_history_file)
+        @import_file = CSVParser.new(sales_history_file, header_mapping: LEGACY_HEADER_MAPPING)
         check_import_file_headers
-        @springboard = client
+        @heartland = client
         parse_options(options)
         parse_valid_import_times
-        $custom_fields = FieldManager.new(@springboard)
+        $custom_fields = FieldManager.new(@heartland)
         $account = AccountPrepper.new(
-          @springboard,
+          @heartland,
           use_cache: @use_cache,
           refresh_cache: @refresh_cache,
           skip_tickets: @skip_ticket_download
@@ -167,8 +179,8 @@ module SRDM
 
       def create_stations(locations_missing_stations)
         locations_missing_stations.each do |location|
-          sr_location = springboard[:locations].filter('$or' => [{public_id: location}, {name: location}]).first
-          springboard[:stations].post!(location_id: sr_location.id, active: true, name: 'Station 1')
+          sr_location = heartland[:locations].filter('$or' => [{public_id: location}, {name: location}]).first
+          heartland[:stations].post!(location_id: sr_location.id, active: true, name: 'Station 1')
         end
         SRDM::LOG.info "Successfully created #{locations_missing_stations.count} stations"
       end
@@ -196,9 +208,9 @@ module SRDM
       def import_ticket(ticket)
         retry_count = 0
         begin
-          @springboard[:sales][:tickets].post!(ticket.to_h)
+          @heartland[:sales][:tickets].post!(ticket.to_h)
           @success_count += 1
-        rescue Springboard::Client::RequestFailed => err
+        rescue HeartlandRetail::Client::RequestFailed => err
           if (retry_count += 1) <= MAX_RETRIES
             ticket.flatten_line_qtys if ticket_qty_error?(err)
             retry unless unfixable_request_error?(err)

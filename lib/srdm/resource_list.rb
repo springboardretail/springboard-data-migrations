@@ -9,13 +9,13 @@ module SRDM
       'sales/tickets' => 'sales.transaction'
     }
 
-    attr_reader :resource_path, :resource_name, :springboard, :lookup_key, :value_key,
+    attr_reader :resource_path, :resource_name, :heartland, :lookup_key, :value_key,
                 :use_cache, :refresh_cache, :alt_lookups, :show_bar, :bar
 
     def initialize(resource_path, client, options = {})
       @resource_path = resource_path
       @resource_name = resource_path.split('/').last
-      @springboard = client
+      @heartland = client
       init_options(options)
       @bar = ProgressBar.new(resource.count) if show_bar
     end
@@ -43,7 +43,7 @@ module SRDM
     private
 
     def _build_resource
-      r = springboard[resource_path].sort(:id)
+      r = heartland[resource_path].sort(:id)
       r = r.query('_only' => resource_fields_needed)
       r = r.filter(@custom_filter) if @custom_filter
       r = r.query(per_page: resource_query_size)
@@ -114,7 +114,7 @@ module SRDM
 
     def collect_alt_lookup_fields
       group_id = RESOURCE_GROUP_ID[resource_path]
-      fields = @springboard[:custom_fields].filter(group_id: group_id, unique: true)
+      fields = @heartland[:custom_fields].filter(group_id: group_id, unique: true)
       fields.map { |field| field['key'] }
     end
 

@@ -1,7 +1,7 @@
 module SRDM
   class FieldManager
     def initialize(client, *groups, include_settings: true)
-      @springboard = client
+      @heartland = client
       @include_settings = include_settings
       @groups = groups
       @groups = ['sales.transaction', 'sales.transaction.line_item'] if groups.count.zero?
@@ -62,15 +62,15 @@ module SRDM
     private
 
     def change_setting_required_status(setting, value)
-      @springboard[:settings][setting].put!(value: value)
+      @heartland[:settings][setting].put!(value: value)
     end
 
     def change_custom_field_required_status(field_id, value)
-      @springboard[:custom_fields][field_id].put!(required: value)
+      @heartland[:custom_fields][field_id].put!(required: value)
     end
 
     def required?(setting)
-      @springboard[:settings][setting].get.body.value
+      @heartland[:settings][setting].get.body.value
     end
 
     def find_required_fields
@@ -89,7 +89,7 @@ module SRDM
     def find_required_custom_fields
       group_ids = @groups.map { |group| {group_id: group} }
       custom_field_groups = {'$or' => group_ids }
-      @springboard[:custom_fields].filter(custom_field_groups).filter(required: true).each do |field|
+      @heartland[:custom_fields].filter(custom_field_groups).filter(required: true).each do |field|
         @required_custom_fields << field.id
       end
     end

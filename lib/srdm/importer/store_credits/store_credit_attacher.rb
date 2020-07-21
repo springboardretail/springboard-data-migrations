@@ -1,11 +1,11 @@
 module SRDM
   module Importer
     class StoreCreditAttacher
-      attr_reader :field_name, :springboard, :attach_count, :gift_cards
+      attr_reader :field_name, :heartland, :attach_count, :gift_cards
 
       def initialize(field_name, client, options = {})
         @field_name = field_name
-        @springboard = client
+        @heartland = client
         @system = options[:system].to_s.strip.downcase
         @import_set_id = options[:import_set_id]
         @attach_count = 0
@@ -39,7 +39,7 @@ module SRDM
       end
 
       def save_matching_gift_card(customer_id, gift_card)
-        springboard[:customers][customer_id].put! "custom@#{custom_field}" => gift_card_number(gift_card)
+        heartland[:customers][customer_id].put! "custom@#{custom_field}" => gift_card_number(gift_card)
         @attach_count += 1
       end
 
@@ -53,11 +53,11 @@ module SRDM
       def download_gift_cards
         options = { alt_lookups: false, lookup_key: 'number' }
         options[:custom_filter] = { import_set_id: @import_set_id } if @import_set_id
-        @gift_cards = ResourceList.new('gift_cards', springboard, options).to_set
+        @gift_cards = ResourceList.new('gift_cards', heartland, options).to_set
       end
 
       def download_customers
-        @customers = ResourceList.new('customers', springboard, alt_lookups: false).to_h
+        @customers = ResourceList.new('customers', heartland, alt_lookups: false).to_h
       end
 
       def customers_with_card_number(card_list)
@@ -104,15 +104,15 @@ module SRDM
       end
 
       def cust_resource(chunk)
-        springboard[:customers].filter(public_id: {'$in' => chunk}).query('_only' => ['id', 'public_id'])
+        heartland[:customers].filter(public_id: {'$in' => chunk}).query('_only' => ['id', 'public_id'])
       end
 
       def find_or_create_custom_field
         begin
           custom_field_filter = {'$and' => [{'$or' => [{name: field_name}, {key: field_name}]},{group_id: 'customer'}]}
-          existing_custom_field = @springboard[:custom_fields].filter(custom_field_filter).first
+          existing_custom_field = @heartland[:custom_fields].filter(custom_field_filter).first
           return existing_custom_field['key'] if existing_custom_field
-          springboard[:custom_fields].post!(
+          heartland[:custom_fields].post!(
             group_id: 'customer',
             name: field_name,
             validation_type: 'text',
