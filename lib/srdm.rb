@@ -7,7 +7,7 @@ require_relative 'srdm/field_manager'
 require_relative 'srdm/resource_list'
 
 module SRDM
-  VERSION = '1.0.0'
+  VERSION = '1.0.1'
 
   LOG = Logger.new(STDOUT)
 

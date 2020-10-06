@@ -27,7 +27,7 @@ module SRDM
 
       def read_csv
         if @header_mapping
-          csv = CSV.read( @file, headers: true, header_converters: header_lambda)
+          @csv = CSV.read( @file, headers: true, header_converters: header_lambda)
         else
           @csv = CSV.read(@file, headers: @headers, encoding: @encoding)
         end
